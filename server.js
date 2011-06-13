@@ -1,4 +1,4 @@
-include ('config.js');
+require('./config.js');
 
 var http = require('http');
 

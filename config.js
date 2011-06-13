@@ -1,4 +1,3 @@
-var config = {
-  repositories_path:    '/path/to/repositories',
-  authorized_keys_file: '/path/to file'
-};
+exports.port                 = "1986";
+exports.repositories_path    = '/path/to/repositories';
+exports.authorized_keys_file = '/path/to file';

@@ -17,3 +17,4 @@ http.createServer(function (request, response) {
 }).listen(config.port, "127.0.0.1");
 
 console.log('SparkleShare-Web is running at http://127.0.0.1:' + config.port);
+

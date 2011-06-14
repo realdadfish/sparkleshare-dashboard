@@ -1,4 +1,14 @@
-Run:
+SparkleShare-Web - An HTTP API to your SparkleShare server.
 
-   $ node sparkleshare-web.js
+Three simple steps:
 
+   Setup:
+      $ sudo node setup.js
+
+
+   Run:
+      $ node sparkleshare-web.js
+
+
+   Configure:
+      Visit http://127.0.0.1:1986 in your browser

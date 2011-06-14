@@ -1,14 +1,15 @@
-SparkleShare-Web - An HTTP API to your SparkleShare server.
+SparkleShare-Web - A web interface to your SparkleShare server.
 
-Three simple steps:
+Upload sparkleshare-web.zip to your server and
+follow these three simple steps:
 
-   Setup:
-      $ sudo node setup.js
-
+   Set up:
+      $ unzip sparkleshare-web.zip
+      $ cd sparkleshare-web/
+      $ node setup.js
 
    Run:
       $ node sparkleshare-web.js
 
-
    Configure:
-      Visit http://127.0.0.1:1986 in your browser
+      Go to http://127.0.0.1:1986 in your browser

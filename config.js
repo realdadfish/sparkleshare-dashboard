@@ -1,4 +1,3 @@
-exports.username = "admin";
 exports.password = "foo";
 
 exports.port                 = "1986";

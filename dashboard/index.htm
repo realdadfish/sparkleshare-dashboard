@@ -1,0 +1,81 @@
+<html>
+  <head>
+    <title>SparkleShare Dashboard</title>
+    <script type="text/javascript" src="jquery.js"></script>          
+    <script type="text/javascript">                                         
+      $(document).ready(function() {
+        $("input.unlock").click(function() {
+          $("div.lockscreen").animate({
+    top: '-=' + (document.body.scrollHeight - 30)
+  }, 800, function() {
+    // Animation complete.
+  });
+        });
+      });
+    </script>  
+    <style>
+      body {
+        padding: 0;
+        margin: 0;
+        background-color: #333;
+        font-family: sans-serif;
+      }
+      
+      input {
+        font-size: 125%;
+      }
+      
+      div.lockscreen {
+        width: 100%;
+        height: 100%;
+        background-color: #ccc;
+        position: absolute;
+        text-align: center;
+        display: table-cell;
+        vertical-align: middle;
+      }
+      
+      div.lockscreen form {
+        position: relative;
+        top: 40%;
+      }
+      
+      div.pin {
+        color: #fff;
+        font-size: 22px;
+        font-familiy: monospace;
+        background-color: #111;
+        padding: 20px;
+      }
+      
+      div.column {
+        background-color: red;
+        width: 30%;
+        margin: 10px;
+        position: relative;
+        top: 100px;
+        height: 400px;
+        z-index: -1;
+        float: left;
+      }
+    </style>
+  </head>
+  <body>
+   <div class="lockscreen">
+     <form>
+       SparkleShare Dashboard
+       <p><input type="password" />
+       <p><input type="button" value="Unlock" class="unlock" />
+     </form>
+   </div>
+   <div class='column'>Devices
+     <div class='pin'>5HGW5E
+     <p>This PIN will be valid for another <b>5 minutes</b></p>
+     </div>
+   </div>
+   <div class='column'>Link devices
+   </div>
+   <div class='column'>Shared folders
+   </div>
+  </body>
+</html>

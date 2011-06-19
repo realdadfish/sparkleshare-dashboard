@@ -1,12 +1,12 @@
 <html>
   <head>
-    <title>SparkleShare Dashboard</title>
+    <title>Dashboard - SparkleShare </title>
     <script type="text/javascript" src="jquery.js"></script>          
     <script type="text/javascript">                                         
       $(document).ready(function() {
         $("input.unlock").click(function() {
           $("div.lockscreen").animate({
-    top: '-=' + (document.body.scrollHeight - 30)
+    top: '-=' + document.body.scrollHeight
   }, 800, function() {
     // Animation complete.
   });
@@ -22,7 +22,7 @@
         font-family: 'Quattrocento Sans';
       }
       
-      input {
+      form input {
         font-size: 125%;
       }
       
@@ -34,6 +34,7 @@
         text-align: center;
         display: table-cell;
         vertical-align: middle;
+        z-index: 2;
       }
       
       div.lockscreen form {
@@ -43,22 +44,29 @@
       
       div.pin {
         color: #fff;
-        font-size: 22px;
+        font-size: 24px;
         font-familiy: monospace;
-        background-color: #111;
-        padding: 20px;
+        width: 100%;
+        margin-top: 40px;
+        margin-bottom: 40px;
+        text-align: center;
+        letter-spacing: 5px;
+      }
+      
+      div.pin input {
+        margin-top: 12px;
       }
       
       div.column {
       border-radius: 7px;
         background-color: #323232;
-        width: 40%;
-        padding: 18px;
-        margin: 10px;
+        width: 156px;
+        height: 156px;
+        padding: 12px;
+        margin: 4px;
         position: relative;
-        top: 100px;
-        height: 300px;
-        z-index: -1;
+        font-size: 12px;
+
         float: left;
       }
         @font-face {
@@ -78,6 +86,14 @@
     color: #555753;
     text-shadow: #fff 0px 1px 0;
   }
+  #tiles {
+  width: 780px;
+  padding-top: 80px;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+  background-color: red;
+  }
     </style>
   </head>
   <body>
@@ -88,18 +104,19 @@
        <p><input type="button" value="Unlock" class="unlock" />
      </form>
    </div>
-   <div class='column'>devices
-     <div class='pin'>5HGW5E
-     <p>This PIN will be valid for another <b>5 minutes</b></p>
+   <div id="tiles">SparkleShare Dashboard
+   <div>
+     <div class='column'>folders</div>
+     <div class='column'>devices</div>
+     <div class='column'>link device<br><br>
+     <small>Simply point your device to 127.0.0.1 and enter this token:</small>
+          <div class='pin'>5HGW5E<br><input type="button" value="Copy" /></div>
+       <small>Creating new token in <b>5 minutes</b></small>
+       
+     </div>
+     <div class='column'><b>0.5 GB</b> used<br><b>483 GB</b> available</div>
+     <div id="copyright">&copy; Copyright 2011<br/>The SparkleShare Community</div>
      </div>
    </div>
-   <div class='column'>link device
-   <p>Simply point SparkleShare to 127.0.0.1 and enter the token below.</p>
-   </div>
-   <div class='column'>shared folders
-   </div>
-   <div class='column'>stats
-   </div>
-   <div id="copyright">&copy; Copyright 2011<br/>The SparkleShare Community</div>
   </body>
 </html>

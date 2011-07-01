@@ -9,12 +9,28 @@
 //
    
 var config = require('./config');
-var http = require('http');
+var net = require('net');
 
-http.createServer(function (request, response) {
-  response.writeHead(200, {'Content-Type': 'text/plain'});
-  response.end(request.method + " " + request.url);
-}).listen(config.port, "127.0.0.1");
 
-console.log('SparkleShare-Web is running at http://127.0.0.1:' + config.port);
+function announcementServer() {
 
+    this.create = function() {
+        this.server = net.createServer(function (socket) {
+          socket.write("Echo server\r\n");
+          socket.pipe(socket);
+        });
+
+
+    }
+
+    this.run = function() {
+        this.running = true;
+        this.server.listen(1337, "127.0.0.1");
+        console.log('SparkleShare-Web is running at http://127.0.0.1:' + config.port_announce_in);
+    }
+
+    this.create();
+}
+
+server = new announcementServer();
+server.run();

@@ -19,20 +19,21 @@ However, many people know how to set up a basic website, or how to set up
 a Wordpress blog, so they can help others who are less interested in
 digital technology, but do care about privacy and freedom.
 
-So that is the goal: simplicity. You should be able to set up SparkleShare-Dashboard
-in no more than 3 terminal commands. This includes logging into your server and
-download the package. From there, it needs to Just Work (TM). After that, you should
-be able to connect to it by providing the address (given) and a PIN, or a button
-that opens a file with a SparkleShare mimetype, so it take only one click to connect.
+So that is the goal: simplicity. You should be able to set up 
+SparkleShare-Dashboard in no more than 3 terminal commands. This includes 
+logging into your server and download the package. From there, it needs 
+to Just Work (TM). After that, you should be able to connect to it by 
+providing the address (given) and a PIN, or a button that opens a file with 
+a SparkleShare mimetype, so it take only one click to connect.
 
 
 Design decisions
 ================
 
-The server will be build on NodeJS. This is for several reasons: 
-it doesn't have many dependencies (in fact it compiles on most default
-systems), it's easy to add javascript libraries, it's light, and it seems 
-to be all the rage lately.
+The server will be build on NodeJS. This is for several reasons: it doesn't 
+have many dependencies (in fact it compiles on most default systems), it's 
+easy to add javascript libraries, it's light, and it seems to be all the 
+rage lately.
 
 
 UI design

@@ -2,7 +2,9 @@
 html
   head
     title SparkleShare Dashboard
+    link(rel='stylesheet', href='/stylesheets/reset.css')
     link(rel='stylesheet', href='/stylesheets/style.css')
-    script(type='text/javascript', src='/javascripts/qrcode.js')
-    script(type='text/javascript', src='/javascripts/qrcanvas.js')
-  body!= body
+  body
+    include includes/header
+    != body
+    include includes/footer

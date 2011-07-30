@@ -118,7 +118,7 @@ app.post('/createFirstUser', userDbEmpty, function(req, res) {
     return reRenderForm();
   }
 
-  userProvider.createNew(req.body.login, req.body.name, req.body.passwd1, function(error, user) {
+  userProvider.createNew(req.body.login, req.body.realname, req.body.passwd1, function(error, user) {
     if (error) {
       req.flash('error', error);
       reRenderForm();
@@ -129,7 +129,7 @@ app.post('/createFirstUser', userDbEmpty, function(req, res) {
 });
 
 app.post('/login', function(req, res){
-  auth(req.body.username, req.body.password, function(error, user) {
+  auth(req.body.login, req.body.password, function(error, user) {
     if (error) {
       req.flash('error', error);
       res.render('login');

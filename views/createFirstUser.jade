@@ -7,13 +7,13 @@ form(method="POST", action="/createFirstUser")
     label Username:
     input(name="login", value=formval.login)
   p
-    label Name:
-    input(name="name", value=formval.name)
-  p
     label Password:
     input(type="password", name="passwd1")
   p
     label Check password:
     input(type="password", name="passwd2")
+  p
+    label Name:
+    input(name="realname", value=formval.name)
   p
     input(type="submit", value="Create user")

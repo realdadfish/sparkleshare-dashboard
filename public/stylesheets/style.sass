@@ -1,4 +1,5 @@
 !bgcol= #EEEEEC
+!actlinkcol= #F57900
 
 body
   :background-color !bgcol
@@ -15,7 +16,7 @@ a
   :font-weight bold
   :text-decoration none
   &:hover
-    :color #f57900
+    :color !actlinkcol
 
 #header
   :width 610px
@@ -53,6 +54,12 @@ a
 
 #content
   :padding 32px
+  a:visited
+    :color !bgcol
+  a
+    :color !bgcol
+    &:hover
+      :color !actlinkcol
 
 h1
   :color white
@@ -81,9 +88,17 @@ input
   :background-image -webkit-gradient(linear, left top, left bottombottom, from(#bcbcbe), to(#ffffff))
   :background-image -moz-linear-gradient(top,  #bcbcbe,  #ffffff)
   &:focus
-    =box-shadow 0 0 7px #f57900
+    =box-shadow 0 0 7px !actlinkcol
   &[type="submit"]
     :width 210px
     :padding 0
     :height 35px
     :margin-top 1.5em
+
+ul.folders
+  :list-style none
+  li
+    :padding-left 42px
+    :line-height 32px
+    &.git
+      :background url('../images/folder-git.png') no-repeat left center

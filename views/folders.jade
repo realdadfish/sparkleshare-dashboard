@@ -2,8 +2,7 @@ h1 Folders
 
 != messages()
 
-- each folder in folders
-  li
-    strong= folder.type
-    \:
-    a(href="/folder/" + folder.id) #{folder.path}
+ul.folders
+  - each folder in folders
+    li(class=folder.type)
+      a(href="/folder/" + folder.id)= folder.name

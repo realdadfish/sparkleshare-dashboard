@@ -1,0 +1,19 @@
+h1 Create first user
+
+!= messages()
+
+form(method="POST", action="/createFirstUser")
+  p
+    label Username:
+    input(name="login", value=formval.login)
+  p
+    label Name:
+    input(name="name", value=formval.name)
+  p
+    label Password:
+    input(type="password", name="passwd1")
+  p
+    label Check password:
+    input(type="password", name="passwd2")
+  p
+    input(type="submit", value="Create user")

@@ -147,8 +147,7 @@ app.post('/login', function(req, res){
   });
 });
 
-//app.get('/folders', restrict, function(req, res){
-app.get('/folder/:folderId?', function(req, res, next){
+app.get('/folder/:folderId?', restrict, function(req, res, next){
   if (!req.params.folderId) {
     folderProvider.findAll(function(error, folders){
       if (error) {return next(error);}

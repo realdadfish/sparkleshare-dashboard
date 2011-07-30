@@ -1,6 +1,70 @@
+!bgcol= #EEEEEC
+
 body
-  :background-color #EEEEEC
+  :background-color !bgcol
   :font-family "Quattrocento Sans", "Myriad Pro", sans-serif
   :font-size 14px
   :letter-spacing -0.1px
   :line-height 20px
+
+#logo
+  :height 96px
+  :margin 8px auto
+  :width 610px
+  :background url("../images/sparkleshare-logo.png") no-repeat
+
+#footer
+  :clear both
+  :color #555753
+  :font-size 14px
+  :height auto
+  :margin 0 auto
+  :padding 48px
+  :text-align center
+  :text-shadow 0 1px 0 #FFFFFF
+
+#wrapper
+  :background-image -webkit-gradient(linear, left bottom, left top, color-stop(0.13, rgb(50,50,50)), color-stop(0.57, rgb(27,27,27)))
+  :background-image -moz-linear-gradient(center bottom, rgb(50,50,50) 13%, rgb(27,27,27) 57%)
+  =border-radius 7px
+  :min-height 300px
+  :margin 0 auto
+  :width 645px
+  :color !bgcol
+
+#content
+  :padding 32px
+
+h1
+  :color white
+  :font-size 18px
+  :margin-bottom 16px
+
+label
+  :display block
+  :margin-top 1em
+
+input
+  :margin-left 2em
+  :margin-top 0.5em
+  :width 200px
+  :height 25px
+  :padding 5px
+  :background-color !bgcol
+
+  :font-weight bold
+  :font-size 12px
+
+  :border 1px solid #717171
+  =border-radius 3px
+  :text-shadow 0px 1px 0px #fff
+  :outline none
+  :background-image -webkit-gradient(linear, left top, left bottombottom, from(#bcbcbe), to(#ffffff))
+  :background-image -moz-linear-gradient(top,  #bcbcbe,  #ffffff)
+  &:focus
+    =box-shadow 0 0 7px #f57900
+  &[type="submit"]
+    :width 210px
+    :padding 0
+    :height 35px
+    :margin-top 1.5em

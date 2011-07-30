@@ -6,5 +6,8 @@ html
     link(rel='stylesheet', href='/stylesheets/style.css')
   body
     include includes/header
-    != body
+    #wrapper
+      #content
+        != messages()
+        != body
     include includes/footer

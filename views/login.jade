@@ -1,18 +1,16 @@
-h1 Login
+h1 Login to your Dashboard
 
-!= messages()
-
-p Try accessing <a href="/folder">/folder</a>.
 - if (!user)
   form(method="POST", action="/login")
-    p
-      label Username:
-      input(type="text", name="username")
-    p
-      label Password:
-      input(type="password", name="password")
-    p
-      input(type="submit", value="Login")
+    div
+      label(for="username") Username:
+      input(type="text", name="username", id="username")
+    div
+      label(for="password") Password:
+      input(type="password", name="password", id="password")
+    div
+      input(type="submit", value="Login", class="submit")
+
 - else
   p
     strong Logged in as: 

@@ -23,13 +23,15 @@ UserProvider.prototype = {
     var provider = this;
 
     fs.readFile(this.filename, 'utf8', function(error, data) {
-      if (error) { return next(error); }
-      var u = JSON.parse(data);
       provider.users = [];
 
-      for (var i = 0; i < u.length; i++) {
-        var myuser = new User(u[i]);
-        provider.users.push(myuser);
+      if (!error) {
+        var u = JSON.parse(data);
+
+        for (var i = 0; i < u.length; i++) {
+          var myuser = new User(u[i]);
+          provider.users.push(myuser);
+        }
       }
 
       if (next) {

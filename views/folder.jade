@@ -1,20 +1,15 @@
 h1 Folder #{folder.name}
-p
-  strong ID\:\ 
-    #{folder.id}
-
-p
+p.path
   strong [#{folder.name}]/#{path}
 
-- if (locals.parUrl)
-  p
-    a(href='/folder/' + folder.id + '?' + parUrl) ..
+ul.folders
+  - if (locals.parUrl)
+    li.parent
+      a(href='/folder/' + folder.id + '?' + parUrl) ..
 
-- each entry in tree
-  li
-    strong= entry.type
-    - if (entry.type == 'file')
-      \: #{entry.name}
-    - else
-      \:\ 
-      a(href='/folder/' + folder.id + '?' + entry.url)= entry.name
+  - each entry in tree
+    li(class=entry.type)
+      - if (entry.type == 'file')
+        #{entry.name}
+      - else
+        a(href='/folder/' + folder.id + '?' + entry.url)= entry.name + '/'

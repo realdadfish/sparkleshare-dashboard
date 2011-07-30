@@ -92,7 +92,11 @@ app.get('/login', function(req, res){
     if (count < 1) {
       res.redirect('/createFirstUser');
     } else {
-      res.render('login');
+      if (req.session.user) {
+        res.redirect('/folder');
+      } else {
+        res.render('login');
+      }
     }
   });
 });

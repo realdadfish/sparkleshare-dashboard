@@ -10,9 +10,3 @@ h1 Login to your Dashboard
       input(type="password", name="password", id="password")
     div
       input(type="submit", value="Login", class="submit")
-
-- else
-  p
-    strong Logged in as: 
-    #{user.name} (#{user.login}) 
-    a(href="/logout") Logout

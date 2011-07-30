@@ -7,11 +7,30 @@ body
   :letter-spacing -0.1px
   :line-height 20px
 
-#logo
+  
+a, a:visited
+  :color #555753
+
+a
+  :font-weight bold
+  :text-decoration none
+  &:hover
+    :color #f57900
+
+#header
+  :width 610px
   :height 96px
   :margin 8px auto
-  :width 610px
   :background url("../images/sparkleshare-logo.png") no-repeat
+  #toplinks
+    :float right
+    :margin-top 35px
+    :font-size 16px
+    :font-weight bold
+    :color #555753
+    :text-shadow 0 1px 0 #FFFFFF
+    a
+      :text-shadow 0 1px 0 #FFFFFF
 
 #footer
   :clear both

@@ -1,3 +1,5 @@
 .DS_Store
 .*.sw*
 public/stylesheets/*.css
+user.db.json
+repos

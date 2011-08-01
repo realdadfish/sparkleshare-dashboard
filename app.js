@@ -206,5 +206,21 @@ app.get('/folder/:folderId?', restrict, function(req, res, next){
   }
 });
 
+app.get('/link', restrict, function(req, res) {
+  res.render('linkdevice', {
+    url: 'http://' + req.header('host')
+  });
+});
+
+// TODO
+app.get('/getLinkCode', restrict, function(req, res) {
+  res.contentType('application/json');
+  res.send({
+    code: 12345,
+    validFor: 300,
+    url: 'http://' + req.header('host')
+  });
+});
+
 app.listen(3000);
 console.log("Express server listening on port %d in %s mode", app.address().port, app.settings.env);

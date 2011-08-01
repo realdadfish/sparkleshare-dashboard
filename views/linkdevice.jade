@@ -1,0 +1,41 @@
+h1 Link your device
+
+script(type="text/javascript", src="/javascripts/qrcode.js")
+script(type="text/javascript", src="/javascripts/qrcanvas.js")
+
+p
+  strong Url:
+  #{url}
+
+p
+  strong Link code:
+  span#linkcode
+
+p
+  Easiest way is to scan this code
+
+#qrborder
+  #linkqr
+
+p
+  | This 
+  strong link code 
+  | and this 
+  strong QR code
+  | \ are valid for next
+  span#timeleft 0
+  | \ seconds.
+
+script(type="text/javascript")
+  $(function() {
+    $.ajax({
+      url: '/getLinkCode',
+      dataType: 'json',
+      success: function(data) {
+        $('#linkcode').html(data.code);
+        $('#timeleft').html(data.validFor);
+        append_qrcode(5, 'linkqr', 'SSHARE;URL:' + data.url + ';CODE:' + data.code);
+        // TODO auto refresh
+      }
+    });
+  });

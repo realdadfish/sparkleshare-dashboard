@@ -26,7 +26,8 @@ function parseList(list, curPath, next) {
         name: x[3],
         url: querystring.stringify({
           path: curPath.length ? curPath + '/' + x[3] : x[3],
-          hash: x[2]
+          hash: x[2],
+          name: x[3]
         })
       });
     }
@@ -35,15 +36,27 @@ function parseList(list, curPath, next) {
 }
 
 GitBackend.prototype = {
-  execGit: function(params, next) {
+  execGit: function(params, ondata, next) {
+    if (typeof(next) == "undefined") {
+      next = ondata;
+      ondata = null;
+    }
+
     var g = spawn('git', params, { encoding: 'binary', env: {
       GIT_DIR: this.path
     }});
-      
-    var out = "";
-    g.stdout.on('data', function(data) {
-      out += data.toString('utf8');
-    });
+
+    var out = null;
+    if (ondata) {
+      g.stdout.on('data', function(data) {
+        ondata(null, data);
+      });
+    } else {
+      out = "";
+      g.stdout.on('data', function(data) {
+        out += data.toString('utf8');
+      });
+    }
 
     g.on('exit', function(code) {
       if (code) {
@@ -54,12 +67,16 @@ GitBackend.prototype = {
     });
   },
 
-  getRawData: function(req, next) {
+  getRawData: function(req, ondata, next) {
+    var hash = req.param('hash');
+    if (!hash) {
+      return next(new Error('No hash'));
+    }
     if (!hash.match(/^[a-f0-9]{40}$/)) {
-      next(new Error('Invalid hash'));
+      return next(new Error('Invalid hash'));
     }
 
-    this.execGit(['cat-file', 'blob', hash], next);
+    this.execGit(['cat-file', 'blob', hash], ondata, next);
   },
 
   getItems: function(req, next) {

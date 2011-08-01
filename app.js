@@ -161,28 +161,47 @@ app.get('/folder/:folderId?', restrict, function(req, res, next){
     });
   } else {
     folderProvider.findById(req.params.folderId, function(error, folder){
-      folder.getItems(req, function(error, list) {
-        if (error) { return next(error); }
-
-        var curPath = req.param('path');
-        var parUrl = null;
-
-        if (curPath) {
-          var parPath = curPath.split('/');
-          parPath.pop();
-          parPath = parPath.join('/');
-          parUrl = querystring.stringify({
-            path: parPath
-          });
+      if (req.param('type') == 'file') {
+        var filename = req.param('name');
+        if (!filename) {
+          filename = 'file';
         }
+        res.attachment(filename);
 
-        res.render('folder', {
-          folder: folder,
-          tree: list,
-          path: curPath,
-          parUrl: parUrl
+        folder.getRawData(req,
+          function(error, data) {
+            if (error) { return next(error); }
+            res.write(data);
+          },
+          function(error, data) {
+            if (error) { return next(error); }
+            res.end();
+          }
+        );
+      } else {
+        folder.getItems(req, function(error, list) {
+          if (error) { return next(error); }
+
+          var curPath = req.param('path');
+          var parUrl = null;
+
+          if (curPath) {
+            var parPath = curPath.split('/');
+            parPath.pop();
+            parPath = parPath.join('/');
+            parUrl = querystring.stringify({
+              path: parPath
+            });
+          }
+
+          res.render('folder', {
+            folder: folder,
+            tree: list,
+            path: curPath,
+            parUrl: parUrl
+          });
         });
-      });
+      }
     });
   }
 });

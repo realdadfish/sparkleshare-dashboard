@@ -1,6 +1,5 @@
 var GitBackend = require('./git').GitBackend;
 
-//var folder = new GitBackend(config.folders[0].path);
 Backend = function(config){
   this.id = null;
   this.type = config.type;
@@ -15,8 +14,8 @@ Backend = function(config){
 };
 
 Backend.prototype = {
-  getRawData: function(req, next) {
-    this.backend.getRawData(hash, next);
+  getRawData: function(req, ondata, next) {
+    this.backend.getRawData(req, ondata, next);
   },
 
   getItems: function(req, next) {

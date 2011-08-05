@@ -10,7 +10,7 @@ function append_qrcode(typeNumber,elem_id,text) {
 		}*/
 		var ctx = canvas.getContext('2d');
 
-		var qr = new QRCode(typeNumber, QRErrorCorrectLevel.H);
+		var qr = new QRCode(typeNumber, QRErrorCorrectLevel.M);
 
 		qr.addData(text);
 

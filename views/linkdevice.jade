@@ -33,7 +33,7 @@ script(type="text/javascript")
       success: function(data) {
         $('#linkcode').html(data.code);
         $('#timeleft').html(data.validFor);
-        append_qrcode(5, 'linkqr', 'SSHARE;URL:' + data.url + ';CODE:' + data.code);
+        append_qrcode(4, 'linkqr', 'SSHARE:' + data.url + '#' + data.code);
         // TODO auto refresh
       }
     });

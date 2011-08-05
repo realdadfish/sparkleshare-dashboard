@@ -26,6 +26,8 @@ var FolderProvider = require('./folderProvider').FolderProvider;
 var folderProvider = new FolderProvider(config.folders);
 var UserProvider = require('./userProvider').UserProvider;
 var userProvider = new UserProvider('./user.db.json');
+var LinkCodeProvider = require('./linkCodeProvider').LinkCodeProvider;
+var linkCodeProvider = new LinkCodeProvider();
 
 app.configure('development', function(){
   app.use(express.errorHandler({ dumpExceptions: true, showStack: true })); 
@@ -212,14 +214,12 @@ app.get('/link', restrict, function(req, res) {
   });
 });
 
-// TODO
 app.get('/getLinkCode', restrict, function(req, res) {
+  var code = linkCodeProvider.getNewCode();
+  code.url = 'http://' + req.header('host');
+
   res.contentType('application/json');
-  res.send({
-    code: 12345,
-    validFor: 300,
-    url: 'http://' + req.header('host')
-  });
+  res.send(code);
 });
 
 app.listen(3000);

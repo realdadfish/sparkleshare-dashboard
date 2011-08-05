@@ -16,7 +16,7 @@ LinkCodeProvider.prototype = {
 
     this.validCodes.push({
       code: code,
-      validUntil: (new Date()).getTime() + config.linkCodeValidFor
+      validUntil: (new Date()).getTime() + config.linkCodeValidFor * 1000
     });
 
     return {code: code, validFor: config.linkCodeValidFor};

@@ -31,7 +31,7 @@ var linkCodeProvider = new LinkCodeProvider();
 var DeviceProvider = require('./deviceProvider').DeviceProvider;
 var deviceProvider = new DeviceProvider('./device.db.json');
 
-require('./api')(app, linkCodeProvider, deviceProvider);
+require('./api')(app, linkCodeProvider, deviceProvider, folderProvider);
 
 app.configure('development', function(){
   app.use(express.errorHandler({ dumpExceptions: true, showStack: true })); 

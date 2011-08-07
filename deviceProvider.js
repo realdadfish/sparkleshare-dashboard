@@ -59,7 +59,7 @@ DeviceProvider.prototype = {
     next(null, this.devices);
   },
 
-  findByDeviceIdent: function(login, next) {
+  findByDeviceIdent: function(ident, next) {
     var result = null;
     var resultId = null;
 
@@ -112,12 +112,7 @@ Device.prototype = {
 
   checkAuthCode: function(authCode) {
     return this.authCode == authCode;
-  },
-
-  fillWithNewIdent: function() {
   }
-
-  
 };
 
 exports.DeviceProvider = DeviceProvider;

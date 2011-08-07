@@ -100,7 +100,7 @@ Device = function(data) {
 };
 
 Device.prototype = {
-  genAuthCode: function(len) {
+  genCode: function(len) {
     var chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890-_";
     var salt = '';
 

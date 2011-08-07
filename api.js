@@ -1,4 +1,5 @@
 var linkCodeProvider = null;
+var deviceProvider = null;
 
 function validateLinkCode(req, res, next) {
   var code = req.param('code');
@@ -9,8 +10,9 @@ function validateLinkCode(req, res, next) {
   }
 }
 
-Api = function(app, lcp) {
+Api = function(app, lcp, dp) {
   linkCodeProvider = lcp;
+  deviceProvider = dp;
 
   app.get('/api/getAuthCode', validateLinkCode, function(req, res) {
     res.send('WWWX');

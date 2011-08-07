@@ -28,6 +28,7 @@ var UserProvider = require('./userProvider').UserProvider;
 var userProvider = new UserProvider('./user.db.json');
 var LinkCodeProvider = require('./linkCodeProvider').LinkCodeProvider;
 var linkCodeProvider = new LinkCodeProvider();
+require('./api')(app, linkCodeProvider);
 
 app.configure('development', function(){
   app.use(express.errorHandler({ dumpExceptions: true, showStack: true })); 

@@ -37,6 +37,7 @@ LinkCodeProvider.prototype = {
 
   isCodeValid: function(code) {
     var valid = false;
+    var now = (new Date()).getTime();
 
     for (var i = 0; i < this.validCodes.length; i++) {
       if (this.validCodes[i].code == code && now < this.validCodes[i].validUntil) {

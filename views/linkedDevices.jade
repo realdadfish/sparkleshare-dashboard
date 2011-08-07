@@ -1,0 +1,15 @@
+h1 Linked Devices
+
+- if (devices.length < 1)
+  strong You have no linked devices
+- else
+  ul
+    - each device in devices
+      li
+        - if (device.name)
+          #{device.name}
+        - else
+          #{device.ident}
+
+p
+  a(href="/linkDevice") Link new device

@@ -212,8 +212,17 @@ app.get('/folder/:folderId?', restrict, function(req, res, next){
   }
 });
 
-app.get('/link', restrict, function(req, res) {
-  res.render('linkdevice', {
+app.get('/linkedDevices', restrict, function(req, res, next) {
+  deviceProvider.findAll(function(error, devices) {
+    if (error) { return next(error); }
+    res.render('linkedDevices', {
+      devices: devices
+    });
+  });
+});
+
+app.get('/linkDevice', restrict, function(req, res) {
+  res.render('linkDevice', {
     url: 'http://' + req.header('host')
   });
 });

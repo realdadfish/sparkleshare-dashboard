@@ -14,7 +14,7 @@ Api = function(app, lcp, dp) {
   linkCodeProvider = lcp;
   deviceProvider = dp;
 
-  app.get('/api/getAuthCode', validateLinkCode, function(req, res) {
+  app.post('/api/getAuthCode', validateLinkCode, function(req, res) {
     deviceProvider.createNew(function(error, dev) {
       res.json({
         ident: dev.ident,

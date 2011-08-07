@@ -13,7 +13,7 @@ DeviceProvider = function(filename, next) {
 
 DeviceProvider.prototype = {
   loadFromFile: function(next) {
-    if (!this.filename) { return next(new Error('No filename specified')); }
+    if (!this.filename) { throw new Error('No filename specified'); }
 
     var provider = this;
 
@@ -44,22 +44,14 @@ DeviceProvider.prototype = {
     });
   },
 
-  createNew: function(login, name, password, next) {
+  createNew: function(next) {
     var provider = this;
-    this.findByLogin(login, function(error, device) {
-      if (!device) {
-        var newDevice = new Device();
-        newDevice.login = login;
-        newDevice.name = name;
-        newDevice.setPassword(password);
-        provider.devices.push(newDevice);
-        provider.saveToFile(function(error) {
-          if (error) { return next(error); }
-          next(null, newDevice);
-        });
-      } else {
-        next(new Error('Login already used'));
-      }
+
+    var newDevice = new Device();
+    provider.devices.push(newDevice);
+    provider.saveToFile(function(error) {
+      if (error) { return next(error); }
+      next(null, newDevice);
     });
   },
 
@@ -88,14 +80,14 @@ DeviceProvider.prototype = {
 };
 
 Device = function(data) {
-  this.ident = "";
-  this.authCode = "";
-  this.name = "";
-
   if (data) {
     this.ident = data.ident;
     this.authCode = data.authCode;
     this.name = data.name;
+  } else {
+    this.ident = this.genIdent();
+    this.authCode = this.genAuthCode();
+    this.name = "";
   }
 };
 
@@ -120,7 +112,12 @@ Device.prototype = {
 
   checkAuthCode: function(authCode) {
     return this.authCode == authCode;
+  },
+
+  fillWithNewIdent: function() {
   }
+
+  
 };
 
 exports.DeviceProvider = DeviceProvider;

@@ -2,4 +2,5 @@
 .*.sw*
 public/stylesheets/*.css
 user.db.json
+device.db.json
 repos

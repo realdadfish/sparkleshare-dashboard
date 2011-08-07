@@ -15,7 +15,12 @@ Api = function(app, lcp, dp) {
   deviceProvider = dp;
 
   app.get('/api/getAuthCode', validateLinkCode, function(req, res) {
-    res.send('WWWX');
+    deviceProvider.createNew(function(error, dev) {
+      res.json({
+        ident: dev.ident,
+        authCode: dev.authCode
+      });
+    });
   });
 };
 

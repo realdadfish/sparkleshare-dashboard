@@ -29,7 +29,7 @@ var userProvider = new UserProvider('./user.db.json');
 var LinkCodeProvider = require('./linkCodeProvider').LinkCodeProvider;
 var linkCodeProvider = new LinkCodeProvider();
 var DeviceProvider = require('./deviceProvider').DeviceProvider;
-var deviceProvider = new DeviceProvider();
+var deviceProvider = new DeviceProvider('./device.db.json');
 
 require('./api')(app, linkCodeProvider, deviceProvider);
 

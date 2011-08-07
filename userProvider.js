@@ -18,7 +18,7 @@ UserProvider = function(filename, next) {
 
 UserProvider.prototype = {
   loadFromFile: function(next) {
-    if (!this.filename) { return next(new Error('No filename specified')); }
+    if (!this.filename) { throw new Error('No filename specified'); }
 
     var provider = this;
 

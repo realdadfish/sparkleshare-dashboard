@@ -59,6 +59,39 @@ Api = function(app, lcp, dp, fp) {
       res.json(f);
     });
   });
+
+  app.get('/api/getFile/:folderId', validateAuthCode, function(req, res, next) {
+    folderProvider.findById(req.params.folderId, function(error, folder) {
+      if (error) { return next(error); }
+
+      var filename = req.param('name');
+      if (!filename) {
+        filename = 'file';
+      }
+      res.attachment(filename);
+
+      folder.getRawData(req,
+        function(error, data) {
+          if (error) { return next(error); }
+          res.write(data);
+        },
+        function(error, data) {
+          if (error) { return next(error); }
+          res.end();
+        }
+      );
+    });
+  });
+
+  app.get('/api/getFolderContent/:folderId', validateAuthCode, function(req, res, next) {
+    folderProvider.findById(req.params.folderId, function(error, folder) {
+      folder.getItems(req, function(error, list) {
+        if (error) { return next(error); }
+
+        res.json(list);
+      });
+    });
+  });
 };
 
 module.exports = Api;

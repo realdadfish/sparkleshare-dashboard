@@ -157,6 +157,40 @@ app.post('/login', function(req, res){
   });
 });
 
+app.get('/changePassword', restrict, function(req, res) {
+  res.render('changePassword');
+});
+
+app.post('/changePassword', restrict, function(req, res, next) {
+  if (!req.body.old) {
+    req.flash('error', 'You must provide your old password');
+    return res.render('changePassword');
+  }
+
+  if (!req.body.new1) {
+    req.flash('error', 'New password could not be empty');
+    return res.render('changePassword');
+  }
+
+  if (req.body.new1 != req.body.new2) {
+    req.flash('error', 'Passwords must match');
+    return res.render('changePassword');
+  }
+
+  auth(req.session.user.login, req.body.old, function(error, user) {
+    if (error) {
+      req.flash('error', 'Your old password is not valid');
+      return res.render('changePassword');
+    }
+
+    user.setPassword(req.body.new1);
+    userProvider.updateUser(user, function(error) {
+      req.flash('info', 'Password updated');
+      res.redirect('back');
+    });
+  });
+});
+
 app.get('/folder/:folderId?', restrict, function(req, res, next){
   if (!req.params.folderId) {
     folderProvider.findAll(function(error, folders){

@@ -27,7 +27,11 @@ FolderProvider.prototype.findById = function(id, next) {
     result = this.folders[id];
   }
 
-  next(null, result);
+  if (!result) {
+    next(new Error('No such folder'));
+  } else {
+    next(null, result);
+  }
 };
 
 exports.FolderProvider = FolderProvider;

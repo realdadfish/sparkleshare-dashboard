@@ -70,7 +70,7 @@ UserProvider.prototype = {
 
   updateUser: function(user, next) {
     var id = this.findByLogin(user.login);
-    if (!id) {
+    if (id === null) {
       return next(new Error('No such user'));
     }
     

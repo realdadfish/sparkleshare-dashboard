@@ -22,15 +22,15 @@ Backend.prototype = {
     this.backend.getItems(req, next);
   },
 
-  getId: function(next) {
+  getId: function(next, forBackend) {
     var b = this;
     if (!this.id) {
       this.backend.getId(function(error, id){
         b.id = id;
-        next(null, id);
+        next(null, id, forBackend);
       });
     } else {
-      next(null, this.id);
+      next(null, this.id, forBackend);
     }
   }
 };

@@ -1,16 +1,16 @@
 var Backend = require('./backend/backend').Backend;
 
 FolderProvider = function(folders){
-  var onGotId = function (error, id) {
+  var onGotId = function (error, id, forBackend) {
     if (!error && id) {
-      f[id] = backend;
+      f[id] = forBackend;
     }
   };
 
   for (var i = 0; i < folders.length; i++) {
     var backend = new Backend(folders[i]);
     var f = this.folders;
-    backend.getId(onGotId);
+    backend.getId(onGotId, backend);
   }
 };
 

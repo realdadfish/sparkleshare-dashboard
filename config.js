@@ -6,7 +6,7 @@ exports.https = {
   enabled: false,
   key: '/path/to/private.key',
   cert: '/path/to/cert.crt'
-}
+};
 
 // 300 sec
 exports.linkCodeValidFor = 300;

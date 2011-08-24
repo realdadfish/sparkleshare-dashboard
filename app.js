@@ -6,15 +6,15 @@ var querystring = require('querystring');
 
 var config = require('./config');
 
-var app = module.exports = express.createServer();
-// Comment previous line, and uncomment
-// FROM HERE
-// var fs = require("fs");
-// var privateKey = fs.readFileSync('/path/to/private.key');
-// var certificate = fs.readFileSync('/path/to/certificate.crt');
-// var app = module.exports = express.createServer({ key: privateKey, cert: certificate })
-// TO HERE
-// to enable HTTPS instead of HTTP server.
+var app = null;
+if (config.https.enabled) {
+  var fs = require("fs");
+  var privateKey = fs.readFileSync(config.https.key);
+  var certificate = fs.readFileSync(config.https.cert);
+  app = module.exports = express.createServer({ key: privateKey, cert: certificate });
+} else {
+  app = module.exports = express.createServer();
+}
 
 // Configuration
 

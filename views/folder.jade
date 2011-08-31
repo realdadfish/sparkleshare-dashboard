@@ -1,17 +1,17 @@
 h1 Folder #{folder.name}
 p.tofolders
-  a(href="/folder") Back to folder list
+  a(href=basepath + "/folder") Back to folder list
 p.path
   strong [#{folder.name}]/#{path}
 
 ul.folders
   - if (locals.parUrl)
     li.parent
-      a(href='/folder/' + folder.id + '?type=dir&' + parUrl) ..
+      a(href=basepath + "/folder/" + folder.id + '?type=dir&' + parUrl) ..
 
   - each entry in tree
     li(class=entry.type)
       - if (entry.type == 'file')
-        a(href='/folder/' + folder.id + '?type=file&' + entry.url)= entry.name
+        a(href=basepath + "/folder/" + folder.id + '?type=file&' + entry.url)= entry.name
       - else
-        a(href='/folder/' + folder.id + '?type=dir&' + entry.url)= entry.name + '/'
+        a(href=basepath + "/folder/" + folder.id + '?type=dir&' + entry.url)= entry.name + '/'

@@ -1,5 +1,5 @@
 - if (user)
   #{user.name} (#{user.login}) | 
-  a(href="/logout") Logout
+  a(href=basepath + "logout") Logout
 - else
-  a(href="/login") Login
+  a(href=basepath + "login") Login

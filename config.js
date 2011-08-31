@@ -8,5 +8,7 @@ exports.https = {
   cert: '/path/to/cert.crt'
 };
 
+exports.basepath = '';
+
 // 300 sec
 exports.linkCodeValidFor = 300;

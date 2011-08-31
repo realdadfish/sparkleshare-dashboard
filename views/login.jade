@@ -1,7 +1,7 @@
 h1 Login to your Dashboard
 
 - if (!user)
-  form(method="post", action="/login")
+  form(method="post", action=basepath + "/login")
     div
       label(for="login") Username:
       input(type="text", name="login", id="login")

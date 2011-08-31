@@ -1,7 +1,7 @@
 h1 Link your device
 
-script(type="text/javascript", src="/javascripts/qrcode.js")
-script(type="text/javascript", src="/javascripts/qrcanvas.js")
+script(type="text/javascript", src=basepath + "/javascripts/qrcode.js")
+script(type="text/javascript", src=basepath + "/javascripts/qrcanvas.js")
 
 p
   strong Url:
@@ -28,7 +28,7 @@ p
 script(type="text/javascript")
   $(function() {
     $.ajax({
-      url: '/getLinkCode',
+      url: "#{basepath}/getLinkCode",
       dataType: 'json',
       success: function(data) {
         $('#linkcode').html(data.code);

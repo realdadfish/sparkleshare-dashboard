@@ -2,11 +2,11 @@ h1 Folders
 
 ul.tools
   li.chpass
-    a(href="/changePassword") Change password
+    a(href=basepath + "/changePassword") Change password
   li.link
-    a(href="/linkedDevices") Linked devices
+    a(href=basepath + "/linkedDevices") Linked devices
 
 ul.folders
   - each folder in folders
     li(class=folder.type)
-      a(href="/folder/" + folder.id)= folder.name
+      a(href=basepath + "/folder/" + folder.id)= folder.name

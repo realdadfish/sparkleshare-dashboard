@@ -318,9 +318,42 @@ app.post('/createUser', [isLogged, isAdmin], function(req, res) {
   });
 });
 
+app.get('/publicFolder/:folderId', function(req, res, next) {
+  folderProvider.findById(req.params.folderId, function(error, folder) {
+    if (!folder.pub) {
+      res.render('error', {
+        status: 403,
+        message: 'Bad public link'
+      });
+    } else {
+      if (req.param('type') != 'file') {
+        res.render('error', {
+          status: 403,
+          message: 'Bad public link'
+        });
+      } else {
+        var filename = req.param('name');
+        if (!filename) {
+          filename = 'file';
+        }
+        res.attachment(filename);
 
+        folder.getRawData(req,
+          function(error, data) {
+            if (error) { return next(error); }
+            res.write(data);
+          },
+          function(error, data) {
+            if (error) { return next(error); }
+            res.end();
+          }
+        );
+      }
+    }
+  });
+});
 
-app.get('/folder/:folderId?', isLogged, function(req, res, next){
+app.get('/folder/:folderId?', isLogged, function(req, res, next) {
   if (!req.params.folderId) {
     folderProvider.findAll(function(error, folders){
       if (error) {return next(error);}
@@ -329,7 +362,7 @@ app.get('/folder/:folderId?', isLogged, function(req, res, next){
       });
     });
   } else {
-    folderProvider.findById(req.params.folderId, function(error, folder){
+    folderProvider.findById(req.params.folderId, function(error, folder) {
       if (req.param('type') == 'file') {
         var filename = req.param('name');
         if (!filename) {

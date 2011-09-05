@@ -1,5 +1,5 @@
 exports.folders = [
-  { type: 'git', name: 'Git1', path: '/home/nexus/Desktop/play/SparkleDashboard/repos/g1' }
+  { type: 'git', name: 'Git1', path: '/home/nexus/Desktop/play/SparkleDashboard/repos/g1', pub: false }
 ];
 
 exports.https = {

@@ -5,6 +5,7 @@ Backend = function(config){
   this.type = config.type;
   this.name = config.name;
   this.path = config.path;
+  this.pub = config.pub;
 
   this.backend = null;
 

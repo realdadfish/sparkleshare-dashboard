@@ -13,5 +13,7 @@ ul.folders
     li(class=entry.type)
       - if (entry.type == 'file')
         a(href=basepath + "/folder/" + folder.id + '?type=file&' + entry.url)= entry.name
+        - if (folder.pub)
+          a(href=basepath + "/publicFolder/" + folder.id + '?type=file&' + entry.url) (Public Link)
       - else
         a(href=basepath + "/folder/" + folder.id + '?type=dir&' + entry.url)= entry.name + '/'

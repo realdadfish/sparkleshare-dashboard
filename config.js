@@ -3,6 +3,11 @@ exports.folders = [
   { type: 'git', name: 'Private GIT folder', path: '/path/to/bare/git2.git', pub: false }
 ];
 
+exports.listen = {
+  port: 3000,
+  host: null
+};
+
 exports.https = {
   enabled: false,
   key: '/path/to/private.key',

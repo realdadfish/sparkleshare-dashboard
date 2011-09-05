@@ -431,5 +431,5 @@ app.get('/getLinkCode', [isLogged, isAdmin], function(req, res) {
   res.send(code);
 });
 
-app.listen(3000);
+app.listen(config.listen.port, config.listen.host);
 console.log("Express server listening on port %d in %s mode", app.address().port, app.settings.env);

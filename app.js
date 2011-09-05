@@ -66,7 +66,15 @@ function auth(login, pass, next) {
 
 function isLogged(req, res, next) {
   if (req.session.user) {
-    next();
+    userProvider.findByLogin(req.session.user.login, function(error, user) {
+      if (error || !user) {
+        req.flash('error', 'Access denied!');
+        res.redirect('/login');
+      } else {
+        req.session.user = user;
+        next();
+      }
+    });
   } else {
     req.flash('error', 'Access denied!');
     res.redirect('/login');
@@ -74,14 +82,12 @@ function isLogged(req, res, next) {
 }
 
 function isAdmin(req, res, next) {
-  userProvider.findByLogin(req.session.user.login, function(error, user) {
-    if (error || !user || !user.admin) {
-      req.flash('error', 'Only admin can do this');
-      res.redirect('home');
-    } else {
-      next();
-    }
-  });
+  if (req.session.user.admin) {
+    next();
+  } else {
+    req.flash('error', 'Only admin can do this');
+    res.redirect('home');
+  }
 }
 
 function loadUser(req, res, next) {

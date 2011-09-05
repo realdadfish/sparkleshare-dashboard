@@ -286,9 +286,39 @@ app.post('/deleteUser/:login', [isLogged, isAdmin, loadUser], function(req, res,
   });
 });
 
-app.get('/addUser', [isLogged, isAdmin], function(req, res, next) {
-  res.end("new");
+app.get('/createUser', [isLogged, isAdmin], function(req, res) {
+  res.render('createUser', { formval: {} });
 });
+
+app.post('/createUser', [isLogged, isAdmin], function(req, res) {
+  var reRenderForm = function() {
+    res.render('createUser', {
+      formval: req.body
+    });
+  };
+
+  if (!req.body.passwd1) {
+    req.flash('error', 'Password could not be empty');
+    return reRenderForm();
+  }
+
+  if (req.body.passwd1 != req.body.passwd2) {
+    req.flash('error', 'Passwords must match');
+    return reRenderForm();
+  }
+
+  userProvider.createNew(req.body.login, req.body.realname, req.body.passwd1, req.body.admin == 't', function(error, user) {
+    if (error) {
+      req.flash('error', error);
+      reRenderForm();
+    } else {
+      req.flash('info', 'User created');
+      res.redirect('/manageUsers');
+    }
+  });
+});
+
+
 
 app.get('/folder/:folderId?', isLogged, function(req, res, next){
   if (!req.params.folderId) {

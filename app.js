@@ -64,7 +64,7 @@ function auth(login, pass, next) {
   });
 }
 
-function restrict(req, res, next) {
+function isLogged(req, res, next) {
   if (req.session.user) {
     next();
   } else {
@@ -72,6 +72,30 @@ function restrict(req, res, next) {
     res.redirect('/login');
   }
 }
+
+function isAdmin(req, res, next) {
+  userProvider.findByLogin(req.session.user.login, function(error, user) {
+    if (error || !user || !user.admin) {
+      req.flash('error', 'Only admin can do this');
+      res.redirect('home');
+    } else {
+      next();
+    }
+  });
+}
+
+function loadUser(req, res, next) {
+  if (!req.params.login) {
+    throw new Error('No login specified');
+  } else {
+    userProvider.findByLogin(req.params.login, function(error, user) {
+      if (error || !user) { throw new Error('User not found'); }
+      req.loadedUser = user;
+      next();
+    });
+  }
+}
+
 function userDbEmpty(req, res, next) {
   userProvider.getUserCount(function(error, count) {
     if (count < 1) {
@@ -140,7 +164,7 @@ app.post('/createFirstUser', userDbEmpty, function(req, res) {
     return reRenderForm();
   }
 
-  userProvider.createNew(req.body.login, req.body.realname, req.body.passwd1, function(error, user) {
+  userProvider.createNew(req.body.login, req.body.realname, req.body.passwd1, true, function(error, user) {
     if (error) {
       req.flash('error', error);
       reRenderForm();
@@ -169,11 +193,11 @@ app.post('/login', function(req, res){
   });
 });
 
-app.get('/changePassword', restrict, function(req, res) {
+app.get('/changePassword', isLogged, function(req, res) {
   res.render('changePassword');
 });
 
-app.post('/changePassword', restrict, function(req, res, next) {
+app.post('/changePassword', isLogged, function(req, res, next) {
   if (!req.body.old) {
     req.flash('error', 'You must provide your old password');
     return res.render('changePassword');
@@ -203,7 +227,47 @@ app.post('/changePassword', restrict, function(req, res, next) {
   });
 });
 
-app.get('/folder/:folderId?', restrict, function(req, res, next){
+app.get('/manageUsers', [isLogged, isAdmin], function(req, res, next) {
+  userProvider.findAll(function(error, u) {
+    if (error) { return next(error); }
+    res.render('manageUsers', {
+      users: u
+    });
+  });
+});
+
+app.get('/modifyUser/:login', [isLogged, isAdmin, loadUser], function(req, res, next) {
+  res.render('modifyUser', {
+    u: req.loadedUser
+  });
+});
+
+app.post('/modifyUser/:login', [isLogged, isAdmin, loadUser], function(req, res, next) {
+  var reRenderForm = function() {
+    res.render('modifyUser', {
+      u: req.body
+    });
+  };
+
+  var u = req.loadedUser;
+  u.name = req.body.name;
+  u.admin = req.body.admin == 't' ? true : false;
+
+  userProvider.updateUser(u, function(error) {
+    req.flash('info', 'User updated');
+    res.redirect('back');
+  });
+});
+
+app.get('/deleteUser/:login', [isLogged, isAdmin, loadUser], function(req, res, next) {
+  res.end(req.loadedUser.login);
+});
+
+app.get('/addUser', [isLogged, isAdmin], function(req, res, next) {
+  res.end("new");
+});
+
+app.get('/folder/:folderId?', isLogged, function(req, res, next){
   if (!req.params.folderId) {
     folderProvider.findAll(function(error, folders){
       if (error) {return next(error);}
@@ -258,7 +322,7 @@ app.get('/folder/:folderId?', restrict, function(req, res, next){
   }
 });
 
-app.get('/linkedDevices', restrict, function(req, res, next) {
+app.get('/linkedDevices', [isLogged, isAdmin], function(req, res, next) {
   deviceProvider.findAll(function(error, devices) {
     if (error) { return next(error); }
     res.render('linkedDevices', {
@@ -267,13 +331,13 @@ app.get('/linkedDevices', restrict, function(req, res, next) {
   });
 });
 
-app.get('/linkDevice', restrict, function(req, res) {
+app.get('/linkDevice', [isLogged, isAdmin], function(req, res) {
   res.render('linkDevice', {
     url: 'http://' + req.header('host')
   });
 });
 
-app.get('/getLinkCode', restrict, function(req, res) {
+app.get('/getLinkCode', [isLogged, isAdmin], function(req, res) {
   var code = linkCodeProvider.getNewCode();
   code.url = 'http://' + req.header('host');
 

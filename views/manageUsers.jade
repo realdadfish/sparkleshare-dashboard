@@ -1,0 +1,18 @@
+h1 Known Users
+
+table
+  tr
+    th Username
+    th Name
+    th Modify
+    th Delete
+  - each user in users
+    tr
+      td= user.login
+      td= user.name
+      td
+        a(href=basepath + "/modifyUser/" + encodeURIComponent(user.login)) Modify
+      td
+        a(href=basepath + "/deleteUser/" + encodeURIComponent(user.login)) Delete
+p
+  a(href=basepath + "/addUser") Add new user

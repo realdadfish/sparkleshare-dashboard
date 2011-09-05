@@ -1,0 +1,12 @@
+h1 Modify User "#{u.login}"
+
+form(method="post", action=basepath + "/modifyUser/" + encodeURIComponent(u.login))
+  p
+    label Name:
+    input(name="name", value=u.name)
+  p
+    label Admin:
+    input(type="checkbox", name="admin", value="t", checked=u.admin)
+  p
+    input(type="submit", value="Modify")
+    input(type="hidden", name="login", value=u.login)

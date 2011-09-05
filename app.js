@@ -266,7 +266,24 @@ app.post('/modifyUser/:login', [isLogged, isAdmin, loadUser], function(req, res,
 });
 
 app.get('/deleteUser/:login', [isLogged, isAdmin, loadUser], function(req, res, next) {
-  res.end(req.loadedUser.login);
+  res.render('deleteUser', {
+    u: req.loadedUser
+  });
+});
+
+app.post('/deleteUser/:login', [isLogged, isAdmin, loadUser], function(req, res, next) {
+  var reRenderForm = function() {
+    res.render('deleteUser', {
+      u: req.body
+    });
+  };
+
+  var u = req.loadedUser;
+
+  userProvider.deleteUser(u.login, function(error) {
+    req.flash('info', 'User deleted');
+    res.redirect('back');
+  });
 });
 
 app.get('/addUser', [isLogged, isAdmin], function(req, res, next) {

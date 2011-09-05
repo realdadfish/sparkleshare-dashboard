@@ -88,6 +88,19 @@ UserProvider.prototype = {
     });
   },
 
+  deleteUser: function(login, next) {
+    var id = this.findByLogin(login);
+    if (id === null) {
+      return next(new Error('No such user'));
+    }
+    
+    this.users.splice(id, 1);
+    this.saveToFile(function(error) {
+      if (error) { return next(error); }
+      return next(null);
+    });
+  },
+
   findAll: function(next) {
     next(null, this.users);
   },

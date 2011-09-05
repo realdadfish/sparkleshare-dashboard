@@ -1,0 +1,9 @@
+h1 Delete User "#{u.login}"
+
+form(method="post", action=basepath + "/deleteUser/" + encodeURIComponent(u.login))
+  p
+    label Name:
+    input(name="name", value=u.name, readonly=true)
+  p
+    input(type="submit", value="Delete")
+    input(type="hidden", name="login", value=u.login)

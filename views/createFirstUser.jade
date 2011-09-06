@@ -1,17 +1,66 @@
-h1 Create first user
+.loginscreen.regscreen
+  h1 Create first user
 
-form(method="post", action=basepath + "/createFirstUser")
-  p
-    label Username:
-    input(name="login", value=formval.login)
-  p
-    label Password:
-    input(type="password", name="passwd1")
-  p
-    label Check password:
-    input(type="password", name="passwd2")
-  p
-    label Name:
-    input(name="realname", value=formval.name)
-  p
-    input(type="submit", value="Create user")
+  form(method="post", action=basepath + "/createFirstUser")
+    div.iwrapper.r
+      label(id="loginlabel") Username:
+      input(name="login", value=formval.login, id="login")
+    div.iwrapper.r
+      label(id="passwd1label") Password:
+      input(type="password", name="passwd1", id="passwd1")
+    div.iwrapper.r
+      label(id="passwd2label") Check password:
+      input(type="password", name="passwd2", id="passwd2")
+    div.iwrapper.r
+      label(id="realnamelabel") Name:
+      input(name="realname", value=formval.name, id="realname")
+    input.register(type="submit", value="Create user")
+
+  script(type="text/javascript")
+    $("#login").focus(function() {
+      $("#loginlabel").fadeOut();
+    });
+    $("#login").blur(function() {
+      if ($("#login").val().length == 0) {
+        $("#loginlabel").fadeIn();
+      }
+    });
+    $("#passwd1").focus(function() {
+      $("#passwd1label").fadeOut();
+    });
+    $("#passwd1").blur(function() {
+      if ($("#passwd1").val().length == 0) {
+        $("#passwd1label").fadeIn();
+      }
+    });
+    $("#passwd2").focus(function() {
+      $("#passwd2label").fadeOut();
+    });
+    $("#passwd2").blur(function() {
+      if ($("#passwd2").val().length == 0) {
+        $("#passwd2label").fadeIn();
+      }
+    });
+    $("#realname").focus(function() {
+      $("#realnamelabel").fadeOut();
+    });
+    $("#realname").blur(function() {
+      if ($("#realname").val().length == 0) {
+        $("#realnamelabel").fadeIn();
+      }
+    });
+
+    $(function() {
+      if ($("#login").val().length != 0) {
+        $("#loginlabel").hide();
+      }
+      if ($("#passwd1").val().length != 0) {
+        $("#passwd1label").hide();
+      }
+      if ($("#passwd2").val().length != 0) {
+        $("#passwd2label").hide();
+      }
+      if ($("#realname").val().length != 0) {
+        $("#realnamelabel").hide();
+      }
+    });

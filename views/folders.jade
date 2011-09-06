@@ -1,13 +1,6 @@
 h1 Folders
 
-ul.tools
-  li.chpass
-    a(href=basepath + "/changePassword") Change password
-  - if (user.admin)
-    li.mngusers
-      a(href=basepath + "/manageUsers") Manage users
-    li.link
-      a(href=basepath + "/linkedDevices") Linked devices
+include includes/toolbox
 
 ul.folders
   - each folder in folders

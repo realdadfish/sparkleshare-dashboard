@@ -8,9 +8,10 @@ html(xmlns="http://www.w3.org/1999/xhtml")
     link(rel='shortcut icon', href=basepath + '/images/favicon.png')
     script(type='text/javascript', src=basepath + '/javascripts/jquery-1.6.2.min.js')
   body
-    include includes/header
-    #wrapper
-      #content
-        != messages()
-        != body
-    include includes/footer
+    #outerwrapper
+      include includes/header
+      #wrapper
+        #content
+          != messages()
+          != body
+        include includes/footer

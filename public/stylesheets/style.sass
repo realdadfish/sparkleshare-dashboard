@@ -2,62 +2,53 @@
 !actlinkcol= #F57900
 
 body
-  :background-color !bgcol
   :font-family "Quattrocento Sans", "Myriad Pro", sans-serif
   :font-size 14px
   :letter-spacing -0.1px
   :line-height 20px
+  :color !bgcol
+  :background-color #222
 
-  
-a, a:visited
-  :color #555753
-
-a
-  :font-weight bold
-  :text-decoration none
-  &:hover
-    :color !actlinkcol
+#outerwrapper
+  :background-color !bgcol
 
 #header
-  :width 610px
-  :height 96px
-  :margin 8px auto
-  :background url("../images/sparkleshare-logo.png") no-repeat
+  :height 34px
+  :padding 1em
+  :background url("../images/sparkleshare-logo.png") no-repeat 1em center
+  :background-color !bgcol
+
   #toplinks
     :float right
-    :margin-top 35px
+    :margin-top 8px
     :font-size 16px
     :font-weight bold
     :color #555753
-    :text-shadow 0 1px 0 #FFFFFF
+    :text-shadow 0 2px 0px #fff
     a
-      :text-shadow 0 1px 0 #FFFFFF
+      :text-shadow 0 2px 0 #fff
   #homelink
     :display block
     :float left
-    :height 96px
+    :height 34px
     :width 280px
     span
       :display none
 
 #footer
   :clear both
-  :color #555753
+  :color #fff
   :font-size 14px
   :height auto
   :margin 0 auto
   :padding 48px
   :text-align center
-  :text-shadow 0 1px 0 #FFFFFF
 
 #wrapper
-  :background-image -webkit-gradient(linear, left bottom, left top, color-stop(0.13, rgb(50,50,50)), color-stop(0.57, rgb(27,27,27)))
-  :background-image -moz-linear-gradient(center bottom, rgb(50,50,50) 13%, rgb(27,27,27) 57%)
-  =border-radius 7px
-  :min-height 300px
-  :margin 0 auto
-  :width 645px
-  :color !bgcol
+  =border-radius 7px 7px 0 0
+  =box-shadow 2px -4px 3px #bbb;
+  :background-color #222
+  :height 100%
 
 #content
   :padding 32px
@@ -67,6 +58,64 @@ a
     :color !bgcol
     &:hover
       :color !actlinkcol
+
+.loginscreen
+  :width 440px
+  :margin 0 auto
+  .iwrapper
+    :width 200px
+    :height 35px
+    :position relative
+    :float left
+    :margin 0 5px 0 5px
+    :background-image -webkit-gradient(linear, left top, left bottombottom, from(#bcbcbe), to(#ffffff))
+    :background-image -moz-linear-gradient(top,  #bcbcbe,  #ffffff)
+    :border 1px solid #717171
+    =border-radius 3px
+    label
+      :position absolute
+      :top 0
+      :left 5px
+      :margin 0
+      :padding 0
+      :width 200px
+      :height 35px
+      :display block
+      :z-index 1
+      :line-height 35px
+      :font-weight bold
+      :color #999
+    input
+      :position absolute
+      :top 0
+      :left 5px
+      :margin 0
+      :padding 0
+      :width 190px
+      :height 35px
+      :z-index 2
+      :background transparent
+      :border none
+      =border-radius 0
+      &:focus
+        
+  input.login
+    :width 80px
+    :height 35px
+    :margin 1em 5px
+  h1
+    :text-align center
+    :margin-bottom 4em
+
+a, a:visited
+  :color #555753
+
+a
+  :font-weight bold
+  :text-decoration none
+  &:hover
+    :color !actlinkcol
+
 
 h1
   :color white
@@ -94,13 +143,6 @@ input
   :outline none
   :background-image -webkit-gradient(linear, left top, left bottombottom, from(#bcbcbe), to(#ffffff))
   :background-image -moz-linear-gradient(top,  #bcbcbe,  #ffffff)
-  &:focus
-    =box-shadow 0 0 7px !actlinkcol
-  &[type="submit"]
-    :width 210px
-    :padding 0
-    :height 35px
-    :margin-top 1.5em
 
 ul.folders
   :list-style none

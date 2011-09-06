@@ -1,12 +1,39 @@
-h1 Login to your Dashboard
+.loginscreen
+  h1 Login to your Dashboard
 
-- if (!user)
-  form(method="post", action=basepath + "/login")
-    div
-      label(for="login") Username:
-      input(type="text", name="login", id="login")
-    div
-      label(for="password") Password:
-      input(type="password", name="password", id="password")
-    div
-      input(type="submit", value="Login", class="submit")
+  - if (!user)
+    form(method="post", action=basepath + "/login")
+      div.iwrapper
+        label(for="login", id="loginlabel") Username:
+        input(type="text", name="login", id="login")
+      div.iwrapper
+        label(for="password", id="passwordlabel") Password:
+        input(type="password", name="password", id="password")
+      input.login(type="submit", value="Login", class="submit")
+
+  script(type="text/javascript")
+    $("#login").focus(function() {
+      $("#loginlabel").fadeOut();
+    });
+    $("#login").blur(function() {
+      if ($("#login").val().length == 0) {
+        $("#loginlabel").fadeIn();
+      }
+    });
+    $("#password").focus(function() {
+      $("#passwordlabel").fadeOut();
+    });
+    $("#password").blur(function() {
+      if ($("#password").val().length == 0) {
+        $("#passwordlabel").fadeIn();
+      }
+    });
+
+    $(function() {
+      if ($("#login").val().length != 0) {
+        $("#loginlabel").hide();
+      }
+      if ($("#password").val().length != 0) {
+        $("#passwordlabel").hide();
+      }
+    });

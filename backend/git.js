@@ -28,6 +28,10 @@ function parseList(list, curPath, next) {
           path: curPath.length ? curPath + '/' + x[3] : x[3],
           hash: x[2],
           name: x[3]
+        }),
+        directUrl: querystring.stringify({
+          hash: x[2],
+          name: x[3]
         })
       });
     }

@@ -326,29 +326,22 @@ app.get('/publicFolder/:folderId', function(req, res, next) {
         message: 'Bad public link'
       });
     } else {
-      if (req.param('type') != 'file') {
-        res.render('error', {
-          status: 403,
-          message: 'Bad public link'
-        });
-      } else {
-        var filename = req.param('name');
-        if (!filename) {
-          filename = 'file';
-        }
-        res.attachment(filename);
-
-        folder.getRawData(req,
-          function(error, data) {
-            if (error) { return next(error); }
-            res.write(data);
-          },
-          function(error, data) {
-            if (error) { return next(error); }
-            res.end();
-          }
-        );
+      var filename = req.param('name');
+      if (!filename) {
+        filename = 'file';
       }
+      res.attachment(filename);
+
+      folder.getRawData(req,
+        function(error, data) {
+          if (error) { return next(error); }
+          res.write(data);
+        },
+        function(error, data) {
+          if (error) { return next(error); }
+          res.end();
+        }
+      );
     }
   });
 });

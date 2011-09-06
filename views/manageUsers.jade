@@ -4,12 +4,18 @@ table
   tr
     th Username
     th Name
+    th Admin
     th Modify
     th Delete
   - each user in users
     tr
       td= user.login
       td= user.name
+      td
+        - if (user.admin)
+          | YES
+        - else
+          | no
       td
         a(href=basepath + "/modifyUser/" + encodeURIComponent(user.login)) Modify
       td

@@ -1,0 +1,40 @@
+h1 Change profile
+
+form(method="post", action=basepath + "/changeProfile")
+  p
+    label Name:
+    input(name="name", value=formval.name)
+  p
+    label New password (leave empty for no change):
+    input(type="password", name="new1", id="newpass1")
+  p#newpass2block
+    label Check new password:
+    input(type="password", name="new2", id="newpass2")
+  p
+    input(type="submit", value="Change profile")
+
+script(type="text/javascript")
+  $(function() {
+    $("#newpass2block").hide();
+  });
+
+  function showHideNewPass2() {
+    var p1 = $("#newpass1").val();
+    if (p1.length) {
+      $("#newpass2block").show('fast');
+    } else {
+      $("#newpass2block").hide('fast');
+    }
+  }
+
+  $("#newpass1").blur(function() {
+    showHideNewPass2();
+  });
+
+  $("#newpass1").change(function() {
+    showHideNewPass2();
+  });
+
+  $("#newpass1").keydown(function() {
+    showHideNewPass2();
+  });

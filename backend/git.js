@@ -4,6 +4,7 @@ GitBackend = function (path) {
 
 var spawn = require('child_process').spawn;
 var querystring = require('querystring');
+var mime = require('mime');
 
 function parseList(list, curPath, next) {
   var r = list.split(/\r\n|\r|\n/);
@@ -14,15 +15,20 @@ function parseList(list, curPath, next) {
     x = r[i].match(linere);
     if (x) {
       var type = null;
+      var mimeType = null;
       if (x[1] == 'blob') {
         type = "file";
+        mimeType = mime.lookup(x[3]);
       } else if (x[1] == 'tree') {
         type = "dir";
+        mimeType = "dir";
       }
 
       ret.push({
         id: x[2],
         type: type,
+        mime: mimeType,
+        mimeBase: mimeType.split("/")[0],
         name: x[3],
         url: querystring.stringify({
           path: curPath.length ? curPath + '/' + x[3] : x[3],

@@ -13,7 +13,7 @@ ul.folders
       a(href=basepath + "/folder/" + folder.id + '?type=dir&' + parUrl) ..
 
   - each entry in tree
-    li(class=entry.type)
+    li(class=[entry.type, "mime-" + entry.mimeBase, "mime-" + entry.mime.replace("/", "-")])
       - if (entry.type == 'file')
         a(href=basepath + "/folder/" + folder.id + '?type=file&' + entry.url)= entry.name
         - if (folder.pub)

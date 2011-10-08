@@ -92,6 +92,15 @@ Api = function(app, lcp, dp, fp) {
       });
     });
   });
+
+  app.get('/api/getFolderRevision/:folderId', validateAuthCode, function(req, res, next) {
+    folderProvider.findById(req.params.folderId, function(error, folder) {
+      folder.getCurrentRevision(req, function(error, revision) {
+        if (error) { return next(error); }
+        res.json(revision);
+      });
+    });
+  });
 };
 
 module.exports = Api;

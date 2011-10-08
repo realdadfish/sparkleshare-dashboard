@@ -141,6 +141,18 @@ GitBackend.prototype = {
         }
       }
     );
+  },
+
+  getCurrentRevision: function(req, next) {
+    this.execGit(['rev-list', '--max-count=1', 'HEAD'], function(error, data) {
+      if (error) { return next(error); }
+        var r = data.split(/\r\n|\r|\n/);
+        if (r[0].match(/^[a-f0-9]{40}$/)) {
+          next(null, r[0]);
+        } else {
+          next(new Error('Folder not initialized'));
+        }
+    });
   }
 };
 

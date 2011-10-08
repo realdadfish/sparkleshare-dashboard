@@ -23,6 +23,10 @@ Backend.prototype = {
     this.backend.getItems(req, next);
   },
 
+  getCurrentRevision: function(req, next) {
+    this.backend.getCurrentRevision(req, next);
+  },
+
   getId: function(next, forBackend) {
     var b = this;
     if (!this.id) {

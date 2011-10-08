@@ -8,7 +8,7 @@ var mime = require('mime');
 
 function parseList(list, curPath, next) {
   var r = list.split(/\r\n|\r|\n/);
-  linere = /^[0-9]+\s(blob|tree)\s([a-f0-9]{40})\s(.*)$/;
+  linere = /^[0-9]+\s(blob|tree)\s([a-f0-9]{40})\s+([0-9]+|-)\t+(.*)$/;
 
   ret = [];
   for(var i = 0; i < r.length; i++) {
@@ -18,28 +18,34 @@ function parseList(list, curPath, next) {
       var mimeType = null;
       if (x[1] == 'blob') {
         type = "file";
-        mimeType = mime.lookup(x[3]);
+        mimeType = mime.lookup(x[4]);
       } else if (x[1] == 'tree') {
         type = "dir";
         mimeType = "dir";
       }
 
-      ret.push({
+      var listEntry = {
         id: x[2],
         type: type,
         mime: mimeType,
         mimeBase: mimeType.split("/")[0],
-        name: x[3],
+        name: x[4],
         url: querystring.stringify({
-          path: curPath.length ? curPath + '/' + x[3] : x[3],
+          path: curPath.length ? curPath + '/' + x[4] : x[4],
           hash: x[2],
-          name: x[3]
+          name: x[4]
         }),
         directUrl: querystring.stringify({
           hash: x[2],
-          name: x[3]
+          name: x[4]
         })
-      });
+      };
+
+      if (type == 'file') {
+        listEntry.fileSize = x[3];
+      }
+
+      ret.push(listEntry);
     }
   }
   next(null, ret);
@@ -103,14 +109,14 @@ GitBackend.prototype = {
         baseHash = 'HEAD';
       }
 
-      mybackend.execGit(['ls-tree', baseHash, ''], function(error, data) {
+      mybackend.execGit(['ls-tree', '-l', baseHash, ''], function(error, data) {
         if (error) { return next(error); }
         parseList(data, path, next);
       });
     }
 
     if (!baseHash && path) {
-      this.execGit(['ls-tree', 'HEAD', path], function(error, data) {
+      this.execGit(['ls-tree', '-l', 'HEAD', path], function(error, data) {
         if (error) { return next(error); }
         parseList(data, path, function(error, list) {
           if (error) { return next(error); }

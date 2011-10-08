@@ -16,6 +16,7 @@ ul.folders
     li(class=[entry.type, "mime-" + entry.mimeBase, "mime-" + entry.mime.replace("/", "-")])
       - if (entry.type == 'file')
         a(href=basepath + "/folder/" + folder.id + '?type=file&' + entry.url)= entry.name
+        | (#{entry.fileSize}b)
         - if (folder.pub)
           a(href=basepath + "/publicFolder/" + folder.id + '?' + entry.directUrl) (Public Link)
       - else

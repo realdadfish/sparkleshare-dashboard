@@ -18,3 +18,6 @@ exports.basepath = '';
 
 // 300 sec
 exports.linkCodeValidFor = 300;
+
+// none | min | info | debug
+exports.logging = 'none';

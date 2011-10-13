@@ -153,6 +153,20 @@ GitBackend.prototype = {
           next(new Error('Folder not initialized'));
         }
     });
+  },
+
+  getAllItemCount: function(req, next) {
+    this.execGit(['ls-tree', '-rt', 'HEAD'], function(error, data) {
+      if (error) { return next(error); }
+        var r = data.split(/\r\n|\r|\n/);
+        next(null, r.length - 1);
+    });
+  },
+
+  getFolderItemCount: function(req, next) {
+    this.getItems(req, function(error, items) {
+      next(null, items.length);
+    });
   }
 };
 

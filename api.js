@@ -101,6 +101,24 @@ Api = function(app, lcp, dp, fp) {
       });
     });
   });
+
+  app.get('/api/getAllItemCount/:folderId', validateAuthCode, function(req, res, next) {
+    folderProvider.findById(req.params.folderId, function(error, folder) {
+      folder.getAllItemCount(req, function(error, count) {
+        if (error) { return next(error); }
+        res.json(count);
+      });
+    });
+  });
+
+  app.get('/api/getFolderItemCount/:folderId', validateAuthCode, function(req, res, next) {
+    folderProvider.findById(req.params.folderId, function(error, folder) {
+      folder.getFolderItemCount(req, function(error, count) {
+        if (error) { return next(error); }
+        res.json(count);
+      });
+    });
+  });
 };
 
 module.exports = Api;

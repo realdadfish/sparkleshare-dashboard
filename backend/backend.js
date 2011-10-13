@@ -27,6 +27,14 @@ Backend.prototype = {
     this.backend.getCurrentRevision(req, next);
   },
 
+  getAllItemCount: function(req, next) {
+    this.backend.getAllItemCount(req, next);
+  },
+
+  getFolderItemCount: function(req, next) {
+    this.backend.getFolderItemCount(req, next);
+  },
+
   getId: function(next, forBackend) {
     var b = this;
     if (!this.id) {

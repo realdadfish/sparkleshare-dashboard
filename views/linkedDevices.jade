@@ -7,7 +7,7 @@ h1 Linked Devices
     - each device in devices
       li
         - if (device.name)
-          #{device.name}
+          #{device.name} (#{device.ident})
         - else
           #{device.ident}
 

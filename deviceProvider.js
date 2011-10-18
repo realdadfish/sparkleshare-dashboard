@@ -44,10 +44,11 @@ DeviceProvider.prototype = {
     });
   },
 
-  createNew: function(next) {
+  createNew: function(name, next) {
     var provider = this;
 
     var newDevice = new Device();
+    newDevice.name = name;
     provider.devices.push(newDevice);
     provider.saveToFile(function(error) {
       if (error) { return next(error); }

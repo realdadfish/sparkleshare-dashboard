@@ -35,7 +35,7 @@ Api = function(app, lcp, dp, fp) {
   folderProvider = fp;
 
   app.post('/api/getAuthCode', validateLinkCode, function(req, res) {
-    deviceProvider.createNew(function(error, dev) {
+    deviceProvider.createNew(req.param('name'), function(error, dev) {
       res.json({
         ident: dev.ident,
         authCode: dev.authCode

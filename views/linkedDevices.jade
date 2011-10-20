@@ -3,13 +3,20 @@ h1 Linked Devices
 - if (devices.length < 1)
   strong You have no linked devices
 - else
-  ul
+  table
+    tr
+      th Device name
+      th Ident
+      th
+      th
     - each device in devices
-      li
-        - if (device.name)
-          #{device.name} (#{device.ident})
-        - else
-          #{device.ident}
+      tr
+        td= device.name
+        td= device.ident
+        td
+          a(href=basepath + "/modifyDevice/" + encodeURIComponent(device.ident)) Modify
+        td
+          a(href=basepath + "/unlinkDevice/" + encodeURIComponent(device.ident)) Unlink
 
 p
   a(href=basepath + "/linkDevice") Link new device

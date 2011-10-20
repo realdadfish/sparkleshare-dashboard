@@ -1,40 +1,62 @@
-h1 Link your device
+h1 Link with your mobile SparkleShare device
 
 script(type="text/javascript", src=basepath + "/javascripts/qrcode.js")
 script(type="text/javascript", src=basepath + "/javascripts/qrcanvas.js")
 
 p
-  strong Url:
+  strong URL: 
   #{url}
 
 p
-  strong Link code:
+  strong Link code: 
   span#linkcode
 
-p The easiest way is to scan this code
+#qrpart
+  #qrborder
+    #linkqr
 
-#qrborder
-  #linkqr
-
-p
-  | This 
-  strong link code 
-  | and this 
-  strong QR code
-  | \ are valid for next
-  span#timeleft 0
-  | \ seconds.
+  p
+    | New code will be generated in
+    span#timeleft 0
+    | \ seconds.
 
 script(type="text/javascript")
   $(function() {
-    $.ajax({
-      url: "#{basepath}/getLinkCode",
-      dataType: 'json',
-      success: function(data) {
-        $('#linkcode').html(data.code);
-        $('#timeleft').html(data.validFor);
-        append_qrcode(4, 'linkqr', 'SSHARE:' + data.url + '#' + data.code);
-        // TODO auto refresh
+    function updateQr() {
+      var lqr = $('#linkqr');
+      if (lqr.data('state') != 'updating') {
+        lqr.data('state', 'updating');
+        lqr.html('<img src="#{basepath}/images/throbber.gif" alt="loading"/>');
+        $('#linkcode').html('-----');
+        $('#timeleft').html('?');
+
+        $.ajax({
+          url: "#{basepath}/getLinkCode",
+          dataType: 'json',
+          success: function(data) {
+            $('#linkqr').html('');
+            $('#linkcode').html(data.code);
+            $('#timeleft').html(data.validFor);
+            append_qrcode(4, 'linkqr', 'SSHARE:' + data.url + '#' + data.code);
+            $('#linkqr').data('validLeft', data.validFor);
+            lqr.data('state', 'updated');
+          }
+        });
       }
-    });
+    }
+
+    function checkForUpdateQr() {
+      var vl = $('#linkqr').data('validLeft');
+      if (!vl || vl <= 1) {
+        updateQr();
+      } else {
+        $('#linkqr').data('validLeft', vl - 1);
+        $('#timeleft').html(vl - 1);
+      }
+    }
+
+    checkForUpdateQr();
+    setInterval(function() {
+      checkForUpdateQr();
+    }, 1000);
   });

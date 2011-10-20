@@ -77,6 +77,19 @@ DeviceProvider.prototype = {
     }
 
     return resultId;
+  },
+
+  unlinkDevice: function(ident, next) {
+    var id = this.findByDeviceIdent(ident);
+    if (id === null) {
+      return next(new Error('No such device'));
+    }
+
+    this.devices.splice(id, 1);
+    this.saveToFile(function(error) {
+      if (error) { return next(error); }
+      return next(null);
+    });
   }
 };
 

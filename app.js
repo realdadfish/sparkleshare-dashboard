@@ -137,6 +137,18 @@ function loadUser(req, res, next) {
   }
 }
 
+function loadDevice(req, res, next) {
+  if (!req.params.ident) {
+    throw new Error('No device ident specified');
+  } else {
+    deviceProvider.findByDeviceIdent(req.params.ident, function(error, device) {
+      if (error || !device) { throw new Error('Device not found'); }
+      req.loadedDevice = device;
+      next();
+    });
+  }
+}
+
 function userDbEmpty(req, res, next) {
   userProvider.getUserCount(function(error, count) {
     if (count < 1) {
@@ -450,6 +462,28 @@ app.get('/linkedDevices', [isLogged, isAdmin], function(req, res, next) {
 app.get('/linkDevice', [isLogged, isAdmin], function(req, res) {
   res.render('linkDevice', {
     url: 'http://' + req.header('host')
+  });
+});
+
+
+app.get('/unlinkDevice/:ident', [isLogged, isAdmin, loadDevice], function(req, res, next) {
+  res.render('unlinkDevice', {
+    d: req.loadedDevice
+  });
+});
+
+app.post('/unlinkDevice/:ident', [isLogged, isAdmin, loadDevice], function(req, res, next) {
+  var reRenderForm = function() {
+    res.render('unlinkDevice', {
+      d: req.loadedDevice
+    });
+  };
+
+  var d = req.loadedDevice;
+
+  deviceProvider.unlinkDevice(d.ident, function(error) {
+    req.flash('info', 'Device unlinked');
+    res.redirect('/linkedDevices');
   });
 });
 

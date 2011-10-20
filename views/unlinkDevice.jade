@@ -1,0 +1,17 @@
+h1 Unlink device 
+  - if (d.name)
+    | "#{d.name}" (#{d.ident})
+  - else
+    | "#{d.ident}"
+
+form(method="post", action=basepath + "/unlinkDevice/" + encodeURIComponent(d.ident))
+  p
+    - if (d.name)
+      label Name:
+      input(name="name", value=d.name, readonly=true)
+    - else
+      label Ident:
+      input(name="name-ident", value=d.ident, readonly=true)
+  p
+    input(type="submit", value="Unlink")
+    input(type="hidden", name="ident", value=d.ident)

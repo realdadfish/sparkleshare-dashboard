@@ -12,6 +12,19 @@
       input.login(type="submit", value="Login", class="submit")
 
   script(type="text/javascript")
+    function hideLabelForAutocomplete() {
+      if ($("#login").val().length != 0) {
+        $("#loginlabel").hide();
+      }
+      if ($("#password").val().length != 0) {
+        $("#passwordlabel").hide();
+      }
+
+      setTimeout(function() {
+        hideLabelForAutocomplete();
+      }, 300);
+    }
+
     $("#login").focus(function() {
       $("#loginlabel").fadeOut();
     });
@@ -30,10 +43,5 @@
     });
 
     $(function() {
-      if ($("#login").val().length != 0) {
-        $("#loginlabel").hide();
-      }
-      if ($("#password").val().length != 0) {
-        $("#passwordlabel").hide();
-      }
+      hideLabelForAutocomplete();
     });

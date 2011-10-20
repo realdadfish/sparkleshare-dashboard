@@ -319,7 +319,7 @@ app.post('/deleteUser/:login', [isLogged, isAdmin, loadUser], function(req, res,
 
   userProvider.deleteUser(u.login, function(error) {
     req.flash('info', 'User deleted');
-    res.redirect('back');
+    res.redirect('/manageUsers');
   });
 });
 

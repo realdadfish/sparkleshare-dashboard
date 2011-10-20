@@ -1,0 +1,13 @@
+h1 Modify device 
+  - if (d.name)
+    | "#{d.name}" (#{d.ident})
+  - else
+    | "#{d.ident}"
+
+form(method="post", action=basepath + "/modifyDevice/" + encodeURIComponent(d.ident))
+  p
+    label Name:
+    input(name="name", value=d.name)
+  p
+    input(type="submit", value="Modify")
+    input(type="hidden", name="ident", value=d.ident)

@@ -79,6 +79,19 @@ DeviceProvider.prototype = {
     return resultId;
   },
 
+  updateDevice: function(device, next) {
+    var id = this.findByDeviceIdent(device.ident);
+    if (id === null) {
+      return next(new Error('No such device'));
+    }
+    
+    this.devices[id] = device;
+    this.saveToFile(function(error) {
+      if (error) { return next(error); }
+      return next(null, device);
+    });
+  },
+
   unlinkDevice: function(ident, next) {
     var id = this.findByDeviceIdent(ident);
     if (id === null) {

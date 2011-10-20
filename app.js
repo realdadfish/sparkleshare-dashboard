@@ -487,6 +487,28 @@ app.post('/unlinkDevice/:ident', [isLogged, isAdmin, loadDevice], function(req, 
   });
 });
 
+app.get('/modifyDevice/:ident', [isLogged, isAdmin, loadDevice], function(req, res, next) {
+  res.render('modifyDevice', {
+    d: req.loadedDevice
+  });
+});
+
+app.post('/modifyDevice/:ident', [isLogged, isAdmin, loadDevice], function(req, res, next) {
+  var reRenderForm = function() {
+    res.render('modifyDevice', {
+      d: req.loadedDevice
+    });
+  };
+
+  var d = req.loadedDevice;
+  d.name = req.body.name;
+
+  deviceProvider.updateDevice(d, function(error) {
+    req.flash('info', 'Device updated');
+    res.redirect('back');
+  });
+});
+
 app.get('/getLinkCode', [isLogged, isAdmin], function(req, res) {
   var code = linkCodeProvider.getNewCode();
   code.url = 'http://' + req.header('host');

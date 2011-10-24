@@ -7,7 +7,7 @@ var querystring = require('querystring');
 var mime = require('mime');
 
 function parseList(list, curPath, next) {
-  var r = list.split(/\r\n|\r|\n/);
+  var r = list.split(/\0/);
   linere = /^[0-9]+\s(blob|tree)\s([a-f0-9]{40})\s+([0-9]+|-)\t+(.*)$/;
 
   ret = [];
@@ -109,14 +109,14 @@ GitBackend.prototype = {
         baseHash = 'HEAD';
       }
 
-      mybackend.execGit(['ls-tree', '-l', baseHash, ''], function(error, data) {
+      mybackend.execGit(['ls-tree', '-z', '-l', baseHash, ''], function(error, data) {
         if (error) { return next(error); }
         parseList(data, path, next);
       });
     }
 
     if (!baseHash && path) {
-      this.execGit(['ls-tree', '-l', 'HEAD', path], function(error, data) {
+      this.execGit(['ls-tree', '-z', '-l', 'HEAD', path], function(error, data) {
         if (error) { return next(error); }
         parseList(data, path, function(error, list) {
           if (error) { return next(error); }

@@ -171,6 +171,18 @@ app.dynamicHelpers({
   }
 });
 
+app.helpers({
+  convertSize: function(bytes) {
+    var unit = 0;
+    while (unit < 3 && bytes >= 1024) {
+      unit++;
+      bytes /= 1024;
+    }
+
+    return (Math.round(bytes * 100, 2) / 100).toString() + " " + ["", "Ki", "Mi", "Gi"][unit] + "B";
+  }
+});
+
 // Routes
 app.get('/', function(req, res){
   res.redirect('/login');

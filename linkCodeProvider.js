@@ -5,12 +5,12 @@ LinkCodeProvider = function() {
 };
 
 LinkCodeProvider.prototype = {
+  // 6 chars for linking code
   codeLen: 6,
 
   getNewCode: function() {
     this.gc();
 
-    // 8 chars for linking code
     var code = Math.floor(Math.random() * Math.pow(10, this.codeLen)).toString();
     code = (new Array(this.codeLen - code.length + 1)).join("0") + code;
 

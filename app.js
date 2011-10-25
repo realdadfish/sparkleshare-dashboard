@@ -229,7 +229,7 @@ app.post('/createFirstUser', userDbEmpty, function(req, res) {
     return reRenderForm();
   }
 
-  userProvider.createNew(req.body.login, req.body.realname, req.body.passwd1, true, function(error, user) {
+  userProvider.createNew(req.body.login, req.body.realname, req.body.passwd1, true, [], function(error, user) {
     if (error) {
       req.flash('error', error);
       reRenderForm();
@@ -304,15 +304,20 @@ app.get('/manageUsers', [isLogged, isAdmin], function(req, res, next) {
 });
 
 app.get('/modifyUser/:login', [isLogged, isAdmin, loadUser], function(req, res, next) {
-  res.render('modifyUser', {
-    u: req.loadedUser
+  folderProvider.findAll(function(error, folders) {
+    if (error) { return next(error); }
+    res.render('modifyUser', {
+      u: req.loadedUser,
+      folders: folders
+    });
   });
 });
 
 app.post('/modifyUser/:login', [isLogged, isAdmin, loadUser], function(req, res, next) {
   var reRenderForm = function() {
     res.render('modifyUser', {
-      u: req.body
+      u: req.body,
+      folders: folders
     });
   };
 
@@ -368,7 +373,7 @@ app.post('/createUser', [isLogged, isAdmin], function(req, res) {
     return reRenderForm();
   }
 
-  userProvider.createNew(req.body.login, req.body.realname, req.body.passwd1, req.body.admin == 't', function(error, user) {
+  userProvider.createNew(req.body.login, req.body.realname, req.body.passwd1, req.body.admin == 't', [], function(error, user) {
     if (error) {
       req.flash('error', error);
       reRenderForm();

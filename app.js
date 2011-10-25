@@ -126,7 +126,7 @@ function isAdmin(req, res, next) {
 }
 
 function checkFolderAcl(req, res, next) {
-  if (!req.params.folderId) {
+  if (!req.params.folderId || req.session.user.admin) {
     next();
   } else {
     if (req.session.user.acl.indexOf(req.params.folderId) >= 0) {
@@ -428,9 +428,11 @@ app.get('/folder/:folderId?', isLogged, checkFolderAcl, function(req, res, next)
     folderProvider.findAll(function(error, folders){
       if (error) { return next(error); }
 
-      for (var fid in folders) {
-        if (!(req.session.user.acl.indexOf(fid) >= 0)) {
-          delete folders[fid];
+      if (!req.session.user.admin) {
+        for (var fid in folders) {
+          if (!(req.session.user.acl.indexOf(fid) >= 0)) {
+            delete folders[fid];
+          }
         }
       }
 

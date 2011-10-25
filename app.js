@@ -314,20 +314,18 @@ app.get('/modifyUser/:login', [isLogged, isAdmin, loadUser], function(req, res, 
 });
 
 app.post('/modifyUser/:login', [isLogged, isAdmin, loadUser], function(req, res, next) {
-  var reRenderForm = function() {
-    res.render('modifyUser', {
-      u: req.body,
-      folders: folders
+  folderProvider.findAll(function(error, folders) {
+    if (error) { return next(error); }
+
+    var u = req.loadedUser;
+    u.name = req.body.name;
+    u.admin = req.body.admin == 't' ? true : false;
+    u.acl = req.body.acl ? req.body.acl : [];
+
+    userProvider.updateUser(u, function(error) {
+      req.flash('info', 'User updated');
+      res.redirect('back');
     });
-  };
-
-  var u = req.loadedUser;
-  u.name = req.body.name;
-  u.admin = req.body.admin == 't' ? true : false;
-
-  userProvider.updateUser(u, function(error) {
-    req.flash('info', 'User updated');
-    res.redirect('back');
   });
 });
 

@@ -333,12 +333,6 @@ app.get('/deleteUser/:login', [isLogged, isAdmin, loadUser], function(req, res, 
 });
 
 app.post('/deleteUser/:login', [isLogged, isAdmin, loadUser], function(req, res, next) {
-  var reRenderForm = function() {
-    res.render('deleteUser', {
-      u: req.body
-    });
-  };
-
   var u = req.loadedUser;
 
   userProvider.deleteUser(u.login, function(error) {
@@ -485,12 +479,6 @@ app.get('/unlinkDevice/:ident', [isLogged, isAdmin, loadDevice], function(req, r
 });
 
 app.post('/unlinkDevice/:ident', [isLogged, isAdmin, loadDevice], function(req, res, next) {
-  var reRenderForm = function() {
-    res.render('unlinkDevice', {
-      d: req.loadedDevice
-    });
-  };
-
   var d = req.loadedDevice;
 
   deviceProvider.unlinkDevice(d.ident, function(error) {
@@ -506,12 +494,6 @@ app.get('/modifyDevice/:ident', [isLogged, isAdmin, loadDevice], function(req, r
 });
 
 app.post('/modifyDevice/:ident', [isLogged, isAdmin, loadDevice], function(req, res, next) {
-  var reRenderForm = function() {
-    res.render('modifyDevice', {
-      d: req.loadedDevice
-    });
-  };
-
   var d = req.loadedDevice;
   d.name = req.body.name;
 

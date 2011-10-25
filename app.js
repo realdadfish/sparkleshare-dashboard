@@ -125,6 +125,19 @@ function isAdmin(req, res, next) {
   }
 }
 
+function checkFolderAcl(req, res, next) {
+  if (!req.params.folderId) {
+    next();
+  } else {
+    if (req.session.user.acl.indexOf(req.params.folderId) >= 0) {
+      next();
+    } else {
+      req.flash('error', 'You do not have a permission to access this folder');
+      res.redirect('home');
+    }
+  }
+}
+
 function loadUser(req, res, next) {
   if (!req.params.login) {
     throw new Error('No login specified');
@@ -410,10 +423,17 @@ app.get('/publicFolder/:folderId', function(req, res, next) {
   });
 });
 
-app.get('/folder/:folderId?', isLogged, function(req, res, next) {
+app.get('/folder/:folderId?', isLogged, checkFolderAcl, function(req, res, next) {
   if (!req.params.folderId) {
     folderProvider.findAll(function(error, folders){
-      if (error) {return next(error);}
+      if (error) { return next(error); }
+
+      for (var fid in folders) {
+        if (!(req.session.user.acl.indexOf(fid) >= 0)) {
+          delete folders[fid];
+        }
+      }
+
       res.render('folders', {
         folders: folders
       });

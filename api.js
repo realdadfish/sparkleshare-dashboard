@@ -4,8 +4,14 @@ var folderProvider = null;
 
 function validateLinkCode(req, res, next) {
   var code = req.param('code');
-  if (code && linkCodeProvider.isCodeValid(code)) {
-    next();
+  if (code) {
+    var valid = linkCodeProvider.isCodeValid(code);
+    if (valid[0]) {
+      req.linkCodeForLogin = valid[1];
+      next();
+    } else {
+      res.send('Invalid link code', 403);
+    }
   } else {
     res.send('Invalid link code', 403);
   }
@@ -35,6 +41,7 @@ Api = function(app, lcp, dp, fp) {
   folderProvider = fp;
 
   app.post('/api/getAuthCode', validateLinkCode, function(req, res) {
+    console.log(req.linkCodeForLogin);
     deviceProvider.createNew(req.param('name'), function(error, dev) {
       res.json({
         ident: dev.ident,

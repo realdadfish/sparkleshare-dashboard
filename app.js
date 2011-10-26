@@ -547,7 +547,7 @@ app.post('/modifyDevice/:ident', [isLogged, isAdmin, loadDevice], function(req, 
 });
 
 app.get('/getLinkCode', [isLogged, isAdmin], function(req, res) {
-  var code = linkCodeProvider.getNewCode();
+  var code = linkCodeProvider.getNewCode(req.session.user.login);
   code.url = 'http://' + req.header('host');
 
   res.contentType('application/json');

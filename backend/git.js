@@ -26,6 +26,7 @@ function parseList(list, curPath, next) {
 
       var listEntry = {
         id: x[2],
+        hash: x[2],
         type: type,
         mime: mimeType,
         mimeBase: mimeType.split("/")[0],

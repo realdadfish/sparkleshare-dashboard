@@ -75,7 +75,10 @@ var linkCodeProvider = new LinkCodeProvider();
 var DeviceProvider = require('./deviceProvider').DeviceProvider;
 var deviceProvider = new DeviceProvider('./device.db.json');
 
-require('./api')(app, linkCodeProvider, deviceProvider, folderProvider);
+var middleware = require('./middleware');
+middleware.setup(userProvider, deviceProvider, folderProvider, linkCodeProvider);
+
+require('./api')(app, deviceProvider, folderProvider, middleware);
 
 app.configure('development', function(){
   app.use(express.errorHandler({ dumpExceptions: true, showStack: true })); 
@@ -85,8 +88,9 @@ app.configure('production', function(){
   app.use(express.errorHandler()); 
 });
 
+
 function auth(login, pass, next) {
- userProvider.findByLogin(login, function(error, user) {
+  userProvider.findByLogin(login, function(error, user) {
     if (!user) {
       return next(new Error('Invalid login'));
     }
@@ -95,92 +99,6 @@ function auth(login, pass, next) {
       return next(null, user);
     } else {
       return next(new Error('Invalid login'));
-    }
-  });
-}
-
-function isLogged(req, res, next) {
-  if (req.session.user) {
-    userProvider.findByLogin(req.session.user.login, function(error, user) {
-      if (error || !user) {
-        req.flash('error', 'Access denied!');
-        res.redirect('/login');
-      } else {
-        req.session.user = user;
-        next();
-      }
-    });
-  } else {
-    req.flash('error', 'Access denied!');
-    res.redirect('/login');
-  }
-}
-
-function isAdmin(req, res, next) {
-  if (req.session.user.admin) {
-    next();
-  } else {
-    req.flash('error', 'Only admin can do this');
-    res.redirect('home');
-  }
-}
-
-function checkFolderAcl(req, res, next) {
-  if (!req.params.folderId || req.session.user.admin) {
-    next();
-  } else {
-    if (req.session.user.acl.indexOf(req.params.folderId) >= 0) {
-      next();
-    } else {
-      req.flash('error', 'You do not have a permission to access this folder');
-      res.redirect('home');
-    }
-  }
-}
-
-function loadUser(req, res, next) {
-  if (!req.params.login) {
-    throw new Error('No login specified');
-  } else {
-    userProvider.findByLogin(req.params.login, function(error, user) {
-      if (error || !user) { throw new Error('User not found'); }
-      req.loadedUser = user;
-      next();
-    });
-  }
-}
-
-function loadDevice(req, res, next) {
-  if (!req.params.ident) {
-    throw new Error('No device ident specified');
-  } else {
-    deviceProvider.findByDeviceIdent(req.params.ident, function(error, device) {
-      if (error || !device) { throw new Error('Device not found'); }
-      req.loadedDevice = device;
-      next();
-    });
-  }
-}
-
-function loadFolder(req, res, next) {
-  if (!req.params.folderId) {
-    throw new Error('No folder specified');
-  } else {
-    folderProvider.findById(req.params.folderId, function(error, folder) {
-      if (error || !folder) { throw new Error('Folder not found'); }
-      req.loadedFolder = folder;
-      next();
-    });
-  }
-}
-
-function userDbEmpty(req, res, next) {
-  userProvider.getUserCount(function(error, count) {
-    if (count < 1) {
-      next();
-    } else {
-      req.flash('error', 'There are already some users. Ask admin for an account');
-      res.redirect('/login');
     }
   });
 }
@@ -233,11 +151,11 @@ app.get('/login', function(req, res){
   });
 });
 
-app.get('/createFirstUser', userDbEmpty, function(req, res) {
+app.get('/createFirstUser', middleware.userDbEmpty, function(req, res) {
   res.render('createFirstUser', { formval: {} });
 });
 
-app.post('/createFirstUser', userDbEmpty, function(req, res) {
+app.post('/createFirstUser', middleware.userDbEmpty, function(req, res) {
   var reRenderForm = function() {
     res.render('createFirstUser', {
       formval: req.body
@@ -283,13 +201,13 @@ app.post('/login', function(req, res){
   });
 });
 
-app.get('/changeProfile', isLogged, function(req, res) {
+app.get('/changeProfile', middleware.isLogged, function(req, res) {
   res.render('changeProfile', {
     formval: req.session.user
   });
 });
 
-app.post('/changeProfile', isLogged, function(req, res, next) {
+app.post('/changeProfile', middleware.isLogged, function(req, res, next) {
   var reRenderForm = function() {
     res.render('changeProfile', {
       formval: req.body
@@ -319,7 +237,7 @@ app.post('/changeProfile', isLogged, function(req, res, next) {
   });
 });
 
-app.get('/manageUsers', [isLogged, isAdmin], function(req, res, next) {
+app.get('/manageUsers', [middleware.isLogged, middleware.isAdmin], function(req, res, next) {
   userProvider.findAll(function(error, u) {
     if (error) { return next(error); }
     res.render('manageUsers', {
@@ -328,7 +246,7 @@ app.get('/manageUsers', [isLogged, isAdmin], function(req, res, next) {
   });
 });
 
-app.get('/modifyUser/:login', [isLogged, isAdmin, loadUser], function(req, res, next) {
+app.get('/modifyUser/:login', [middleware.isLogged, middleware.isAdmin, middleware.loadUser], function(req, res, next) {
   folderProvider.findAll(function(error, folders) {
     if (error) { return next(error); }
     res.render('modifyUser', {
@@ -338,7 +256,7 @@ app.get('/modifyUser/:login', [isLogged, isAdmin, loadUser], function(req, res, 
   });
 });
 
-app.post('/modifyUser/:login', [isLogged, isAdmin, loadUser], function(req, res, next) {
+app.post('/modifyUser/:login', [middleware.isLogged, middleware.isAdmin, middleware.loadUser], function(req, res, next) {
   folderProvider.findAll(function(error, folders) {
     if (error) { return next(error); }
 
@@ -354,13 +272,13 @@ app.post('/modifyUser/:login', [isLogged, isAdmin, loadUser], function(req, res,
   });
 });
 
-app.get('/deleteUser/:login', [isLogged, isAdmin, loadUser], function(req, res, next) {
+app.get('/deleteUser/:login', [middleware.isLogged, middleware.isAdmin, middleware.loadUser], function(req, res, next) {
   res.render('deleteUser', {
     u: req.loadedUser
   });
 });
 
-app.post('/deleteUser/:login', [isLogged, isAdmin, loadUser], function(req, res, next) {
+app.post('/deleteUser/:login', [middleware.isLogged, middleware.isAdmin, middleware.loadUser], function(req, res, next) {
   var reRenderForm = function() {
     res.render('deleteUser', {
       u: req.body
@@ -375,11 +293,11 @@ app.post('/deleteUser/:login', [isLogged, isAdmin, loadUser], function(req, res,
   });
 });
 
-app.get('/createUser', [isLogged, isAdmin], function(req, res) {
+app.get('/createUser', [middleware.isLogged, middleware.isAdmin], function(req, res) {
   res.render('createUser', { formval: {} });
 });
 
-app.post('/createUser', [isLogged, isAdmin], function(req, res) {
+app.post('/createUser', [middleware.isLogged, middleware.isAdmin], function(req, res) {
   var reRenderForm = function() {
     res.render('createUser', {
       formval: req.body
@@ -435,7 +353,7 @@ app.get('/publicFolder/:folderId', function(req, res, next) {
   });
 });
 
-app.get('/folder/:folderId?', isLogged, checkFolderAcl, function(req, res, next) {
+app.get('/folder/:folderId?', middleware.isLogged, middleware.checkFolderAcl, function(req, res, next) {
   if (!req.params.folderId) {
     folderProvider.findAll(function(error, folders){
       if (error) { return next(error); }
@@ -499,7 +417,7 @@ app.get('/folder/:folderId?', isLogged, checkFolderAcl, function(req, res, next)
   }
 });
 
-app.get('/linkedDevices', [isLogged, isAdmin], function(req, res, next) {
+app.get('/linkedDevices', [middleware.isLogged, middleware.isAdmin], function(req, res, next) {
   deviceProvider.findAll(function(error, devices) {
     if (error) { return next(error); }
     res.render('linkedDevices', {
@@ -508,20 +426,20 @@ app.get('/linkedDevices', [isLogged, isAdmin], function(req, res, next) {
   });
 });
 
-app.get('/linkDevice', [isLogged, isAdmin], function(req, res) {
+app.get('/linkDevice', [middleware.isLogged, middleware.isAdmin], function(req, res) {
   res.render('linkDevice', {
     url: 'http://' + req.header('host')
   });
 });
 
 
-app.get('/unlinkDevice/:ident', [isLogged, isAdmin, loadDevice], function(req, res, next) {
+app.get('/unlinkDevice/:ident', [middleware.isLogged, middleware.isAdmin, middleware.loadDevice], function(req, res, next) {
   res.render('unlinkDevice', {
     d: req.loadedDevice
   });
 });
 
-app.post('/unlinkDevice/:ident', [isLogged, isAdmin, loadDevice], function(req, res, next) {
+app.post('/unlinkDevice/:ident', [middleware.isLogged, middleware.isAdmin, middleware.loadDevice], function(req, res, next) {
   var reRenderForm = function() {
     res.render('unlinkDevice', {
       d: req.loadedDevice
@@ -536,13 +454,13 @@ app.post('/unlinkDevice/:ident', [isLogged, isAdmin, loadDevice], function(req, 
   });
 });
 
-app.get('/modifyDevice/:ident', [isLogged, isAdmin, loadDevice], function(req, res, next) {
+app.get('/modifyDevice/:ident', [middleware.isLogged, middleware.isAdmin, middleware.loadDevice], function(req, res, next) {
   res.render('modifyDevice', {
     d: req.loadedDevice
   });
 });
 
-app.post('/modifyDevice/:ident', [isLogged, isAdmin, loadDevice], function(req, res, next) {
+app.post('/modifyDevice/:ident', [middleware.isLogged, middleware.isAdmin, middleware.loadDevice], function(req, res, next) {
   var reRenderForm = function() {
     res.render('modifyDevice', {
       d: req.loadedDevice
@@ -558,7 +476,7 @@ app.post('/modifyDevice/:ident', [isLogged, isAdmin, loadDevice], function(req, 
   });
 });
 
-app.get('/getLinkCode', [isLogged, isAdmin], function(req, res) {
+app.get('/getLinkCode', [middleware.isLogged, middleware.isAdmin], function(req, res) {
   var code = linkCodeProvider.getNewCode(req.session.user.login);
   code.url = 'http://' + req.header('host');
 

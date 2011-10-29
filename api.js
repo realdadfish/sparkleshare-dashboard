@@ -1,46 +1,13 @@
-var linkCodeProvider = null;
 var deviceProvider = null;
 var folderProvider = null;
+var middleware = null;
 
-function validateLinkCode(req, res, next) {
-  var code = req.param('code');
-  if (code) {
-    var valid = linkCodeProvider.isCodeValid(code);
-    if (valid[0]) {
-      req.linkCodeForLogin = valid[1];
-      next();
-    } else {
-      res.send('Invalid link code', 403);
-    }
-  } else {
-    res.send('Invalid link code', 403);
-  }
-}
-
-function validateAuthCode(req, res, next) {
-  var ident = req.header('X-SPARKLE-IDENT');
-  var authCode = req.header('X-SPARKLE-AUTH');
-  if (!ident || !authCode) {
-    res.send('Missing auth code', 403);
-  } else {
-    deviceProvider.findByDeviceIdent(ident, function(error, device) {
-      if (!device) {
-        res.send('Invalid ident', 403);
-      } else if (device.checkAuthCode(authCode)) {
-        next();
-      } else {
-        res.send('Invalid auth code', 403);
-      }
-    });
-  }
-}
-
-Api = function(app, lcp, dp, fp) {
-  linkCodeProvider = lcp;
+Api = function(app, dp, fp, mw) {
   deviceProvider = dp;
   folderProvider = fp;
+  middleware = mw;
 
-  app.post('/api/getAuthCode', validateLinkCode, function(req, res) {
+  app.post('/api/getAuthCode', middleware.validateLinkCode, function(req, res) {
     console.log(req.linkCodeForLogin);
     deviceProvider.createNew(req.param('name'), function(error, dev) {
       res.json({
@@ -50,7 +17,7 @@ Api = function(app, lcp, dp, fp) {
     });
   });
   
-  app.get('/api/getFolderList', validateAuthCode, function(req, res, next) {
+  app.get('/api/getFolderList', middleware.validateAuthCode, function(req, res, next) {
     folderProvider.findAll(function(error, folders) {
       if (error) { return next(error); }
       var f = [];
@@ -67,7 +34,7 @@ Api = function(app, lcp, dp, fp) {
     });
   });
 
-  app.get('/api/getFile/:folderId', validateAuthCode, loadFolder, function(req, res, next) {
+  app.get('/api/getFile/:folderId', middleware.validateAuthCode, middleware.loadFolder, function(req, res, next) {
     var filename = req.param('name');
     if (!filename) {
       filename = 'file';
@@ -86,7 +53,7 @@ Api = function(app, lcp, dp, fp) {
     );
   });
 
-  app.get('/api/getFolderContent/:folderId', validateAuthCode, loadFolder, function(req, res, next) {
+  app.get('/api/getFolderContent/:folderId', middleware.validateAuthCode, middleware.loadFolder, function(req, res, next) {
     req.loadedFolder.getItems(req, function(error, list) {
       if (error) { return next(error); }
 
@@ -94,21 +61,21 @@ Api = function(app, lcp, dp, fp) {
     });
   });
 
-  app.get('/api/getFolderRevision/:folderId', validateAuthCode, loadFolder, function(req, res, next) {
+  app.get('/api/getFolderRevision/:folderId', middleware.validateAuthCode, middleware.loadFolder, function(req, res, next) {
     req.loadedFolder.getCurrentRevision(req, function(error, revision) {
       if (error) { return next(error); }
       res.json(revision);
     });
   });
 
-  app.get('/api/getAllItemCount/:folderId', validateAuthCode, loadFolder, function(req, res, next) {
+  app.get('/api/getAllItemCount/:folderId', middleware.validateAuthCode, middleware.loadFolder, function(req, res, next) {
     req.loadedFolder.getAllItemCount(req, function(error, count) {
       if (error) { return next(error); }
       res.json(count);
     });
   });
 
-  app.get('/api/getFolderItemCount/:folderId', validateAuthCode, loadFolder, function(req, res, next) {
+  app.get('/api/getFolderItemCount/:folderId', middleware.validateAuthCode, middleware.loadFolder, function(req, res, next) {
     req.loadedFolder.getFolderItemCount(req, function(error, count) {
       if (error) { return next(error); }
       res.json(count);

@@ -162,6 +162,18 @@ function loadDevice(req, res, next) {
   }
 }
 
+function loadFolder(req, res, next) {
+  if (!req.params.folderId) {
+    throw new Error('No folder specified');
+  } else {
+    folderProvider.findById(req.params.folderId, function(error, folder) {
+      if (error || !folder) { throw new Error('Folder not found'); }
+      req.loadedFolder = folder;
+      next();
+    });
+  }
+}
+
 function userDbEmpty(req, res, next) {
   userProvider.getUserCount(function(error, count) {
     if (count < 1) {

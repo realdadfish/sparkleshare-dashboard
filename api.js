@@ -67,63 +67,51 @@ Api = function(app, lcp, dp, fp) {
     });
   });
 
-  app.get('/api/getFile/:folderId', validateAuthCode, function(req, res, next) {
-    folderProvider.findById(req.params.folderId, function(error, folder) {
+  app.get('/api/getFile/:folderId', validateAuthCode, loadFolder, function(req, res, next) {
+    var filename = req.param('name');
+    if (!filename) {
+      filename = 'file';
+    }
+    res.attachment(filename);
+
+    req.loadedFolder.getRawData(req,
+      function(error, data) {
+        if (error) { return next(error); }
+        res.write(data);
+      },
+      function(error, data) {
+        if (error) { return next(error); }
+        res.end();
+      }
+    );
+  });
+
+  app.get('/api/getFolderContent/:folderId', validateAuthCode, loadFolder, function(req, res, next) {
+    req.loadedFolder.getItems(req, function(error, list) {
       if (error) { return next(error); }
 
-      var filename = req.param('name');
-      if (!filename) {
-        filename = 'file';
-      }
-      res.attachment(filename);
-
-      folder.getRawData(req,
-        function(error, data) {
-          if (error) { return next(error); }
-          res.write(data);
-        },
-        function(error, data) {
-          if (error) { return next(error); }
-          res.end();
-        }
-      );
+      res.json(list);
     });
   });
 
-  app.get('/api/getFolderContent/:folderId', validateAuthCode, function(req, res, next) {
-    folderProvider.findById(req.params.folderId, function(error, folder) {
-      folder.getItems(req, function(error, list) {
-        if (error) { return next(error); }
-
-        res.json(list);
-      });
+  app.get('/api/getFolderRevision/:folderId', validateAuthCode, loadFolder, function(req, res, next) {
+    req.loadedFolder.getCurrentRevision(req, function(error, revision) {
+      if (error) { return next(error); }
+      res.json(revision);
     });
   });
 
-  app.get('/api/getFolderRevision/:folderId', validateAuthCode, function(req, res, next) {
-    folderProvider.findById(req.params.folderId, function(error, folder) {
-      folder.getCurrentRevision(req, function(error, revision) {
-        if (error) { return next(error); }
-        res.json(revision);
-      });
+  app.get('/api/getAllItemCount/:folderId', validateAuthCode, loadFolder, function(req, res, next) {
+    req.loadedFolder.getAllItemCount(req, function(error, count) {
+      if (error) { return next(error); }
+      res.json(count);
     });
   });
 
-  app.get('/api/getAllItemCount/:folderId', validateAuthCode, function(req, res, next) {
-    folderProvider.findById(req.params.folderId, function(error, folder) {
-      folder.getAllItemCount(req, function(error, count) {
-        if (error) { return next(error); }
-        res.json(count);
-      });
-    });
-  });
-
-  app.get('/api/getFolderItemCount/:folderId', validateAuthCode, function(req, res, next) {
-    folderProvider.findById(req.params.folderId, function(error, folder) {
-      folder.getFolderItemCount(req, function(error, count) {
-        if (error) { return next(error); }
-        res.json(count);
-      });
+  app.get('/api/getFolderItemCount/:folderId', validateAuthCode, loadFolder, function(req, res, next) {
+    req.loadedFolder.getFolderItemCount(req, function(error, count) {
+      if (error) { return next(error); }
+      res.json(count);
     });
   });
 };

@@ -121,12 +121,21 @@ module.exports = {
       deviceProvider.findByDeviceIdent(ident, function(error, device) {
         if (!device) {
           res.send('Invalid ident', 403);
+        } else if (!device.owner) {
+          res.send('No device owner', 500);
         } else if (device.checkAuthCode(authCode)) {
-          next();
+          userProvider.findByLogin(device.owner, function(error, user) {
+            if (error || !user) {
+              res.send('Invalid owner', 403);
+            } else {
+              req.deviceAcl = user.acl;
+              next();
+            }
+          });
         } else {
           res.send('Invalid auth code', 403);
         }
       });
     }
   }
-}
+};

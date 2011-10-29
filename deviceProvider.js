@@ -44,11 +44,13 @@ DeviceProvider.prototype = {
     });
   },
 
-  createNew: function(name, next) {
+  createNew: function(name, login, next) {
     var provider = this;
 
     var newDevice = new Device();
     newDevice.name = name;
+    newDevice.owner = login;
+
     provider.devices.push(newDevice);
     provider.saveToFile(function(error) {
       if (error) { return next(error); }
@@ -111,10 +113,12 @@ Device = function(data) {
     this.ident = data.ident;
     this.authCode = data.authCode;
     this.name = data.name;
+    this.owner = data.owner;
   } else {
     this.ident = this.genIdent();
     this.authCode = this.genAuthCode();
     this.name = "";
+    this.owner = null;
   }
 };
 

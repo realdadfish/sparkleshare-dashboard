@@ -8,8 +8,7 @@ Api = function(app, dp, fp, mw) {
   middleware = mw;
 
   app.post('/api/getAuthCode', middleware.validateLinkCode, function(req, res) {
-    console.log(req.linkCodeForLogin);
-    deviceProvider.createNew(req.param('name'), function(error, dev) {
+    deviceProvider.createNew(req.param('name'), req.linkCodeForLogin, function(error, dev) {
       res.json({
         ident: dev.ident,
         authCode: dev.authCode
@@ -54,6 +53,7 @@ Api = function(app, dp, fp, mw) {
   });
 
   app.get('/api/getFolderContent/:folderId', middleware.validateAuthCode, middleware.loadFolder, function(req, res, next) {
+    console.log(req.deviceAcl);
     req.loadedFolder.getItems(req, function(error, list) {
       if (error) { return next(error); }
 

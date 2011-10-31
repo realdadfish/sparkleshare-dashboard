@@ -470,6 +470,10 @@ app.get('/linkDevice', [isLogged, isAdmin], function(req, res) {
   var schema = config.https.enabled ? 'https' : 'http';
   var url = schema + '://' + req.header('host');
 
+  if (config.externalUrl) {
+    url = config.externalUrl;
+  }
+
   res.render('linkDevice', {
     url: url
   });
@@ -511,6 +515,10 @@ app.get('/getLinkCode', [isLogged, isAdmin], function(req, res) {
   var code = linkCodeProvider.getNewCode();
   var schema = config.https.enabled ? 'https' : 'http';
   code.url = schema + '://' + req.header('host');
+
+  if (config.externalUrl) {
+    url = config.externalUrl;
+  }
 
   res.contentType('application/json');
   res.send(code);

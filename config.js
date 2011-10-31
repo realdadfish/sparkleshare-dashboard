@@ -15,6 +15,7 @@ exports.https = {
 };
 
 exports.basepath = '';
+exports.externalUrl = 'https://woot:moot/wtf';
 
 // 300 sec
 exports.linkCodeValidFor = 300;

@@ -466,8 +466,12 @@ app.get('/linkedDevices', [isLogged, isAdmin], function(req, res, next) {
 });
 
 app.get('/linkDevice', [isLogged, isAdmin], function(req, res) {
+  var code = linkCodeProvider.getNewCode();
+  var schema = config.https.enabled ? 'https' : 'http';
+  var url = schema + '://' + req.header('host');
+
   res.render('linkDevice', {
-    url: 'http://' + req.header('host')
+    url: url
   });
 });
 
@@ -505,7 +509,8 @@ app.post('/modifyDevice/:ident', [isLogged, isAdmin, loadDevice], function(req, 
 
 app.get('/getLinkCode', [isLogged, isAdmin], function(req, res) {
   var code = linkCodeProvider.getNewCode();
-  code.url = 'http://' + req.header('host');
+  var schema = config.https.enabled ? 'https' : 'http';
+  code.url = schema + '://' + req.header('host');
 
   res.contentType('application/json');
   res.send(code);

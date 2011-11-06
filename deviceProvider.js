@@ -59,7 +59,23 @@ DeviceProvider.prototype = {
   },
 
   findAll: function(next) {
-    next(null, this.devices);
+    next(null, this.devices.slice());
+  },
+
+  findByUser: function(user, next) {
+    var result = [];
+
+    if (user.admin) {
+      result = this.devices;
+    } else {
+      for (var i = 0; i < this.devices.length; i++) {
+        if (this.devices[i].owner == user.login) {
+          result.push(this.devices[i]);
+        }
+      }
+    }
+
+    next(null, result);
   },
 
   findByDeviceIdent: function(ident, next) {

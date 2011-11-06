@@ -32,7 +32,15 @@ module.exports = {
     if (req.session.user.admin) {
       next();
     } else {
-      next(new error.Permission('Onlu admin can do this!'));
+      next(new error.Permission('Only admin can do this!'));
+    }
+  },
+
+  owningDevice: function(req, res, next) {
+    if (req.session.user.admin || req.loadedDevice.owner == req.session.user.login) {
+      next();
+    } else {
+      next(new error.Permission('You are not admin nor you own this device!'));
     }
   },
 

@@ -436,13 +436,13 @@ app.get('/linkDevice', middleware.isLogged, function(req, res) {
 });
 
 
-app.get('/unlinkDevice/:ident', [middleware.isLogged, middleware.isAdmin, middleware.loadDevice], function(req, res, next) {
+app.get('/unlinkDevice/:ident', [middleware.isLogged, middleware.loadDevice, middleware.owningDevice], function(req, res, next) {
   res.render('unlinkDevice', {
     d: req.loadedDevice
   });
 });
 
-app.post('/unlinkDevice/:ident', [middleware.isLogged, middleware.isAdmin, middleware.loadDevice], function(req, res, next) {
+app.post('/unlinkDevice/:ident', [middleware.isLogged, middleware.loadDevice, middleware.owningDevice], function(req, res, next) {
   var d = req.loadedDevice;
 
   deviceProvider.unlinkDevice(d.ident, function(error) {
@@ -451,13 +451,13 @@ app.post('/unlinkDevice/:ident', [middleware.isLogged, middleware.isAdmin, middl
   });
 });
 
-app.get('/modifyDevice/:ident', [middleware.isLogged, middleware.isAdmin, middleware.loadDevice], function(req, res, next) {
+app.get('/modifyDevice/:ident', [middleware.isLogged, middleware.loadDevice, middleware.owningDevice], function(req, res, next) {
   res.render('modifyDevice', {
     d: req.loadedDevice
   });
 });
 
-app.post('/modifyDevice/:ident', [middleware.isLogged, middleware.isAdmin, middleware.loadDevice], function(req, res, next) {
+app.post('/modifyDevice/:ident', [middleware.isLogged, middleware.loadDevice, middleware.owningDevice], function(req, res, next) {
   var d = req.loadedDevice;
   d.name = req.body.name;
 

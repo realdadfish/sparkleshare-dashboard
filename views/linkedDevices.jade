@@ -5,12 +5,16 @@ h1 Linked Devices
 - else
   table
     tr
+      - if (user.admin)
+        th Owner
       th Device name
       th Ident
       th
       th
     - each device in devices
       tr
+        - if (user.admin)
+          td= device.owner
         td= device.name
         td= device.ident
         td

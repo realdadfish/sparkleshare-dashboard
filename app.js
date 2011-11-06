@@ -82,12 +82,12 @@ middleware.setup(userProvider, deviceProvider, folderProvider, linkCodeProvider)
 
 require('./api')(app, deviceProvider, folderProvider, middleware);
 
-app.use(errors.errorHandler);
 app.configure('development', function(){
   app.use(express.errorHandler({ dumpExceptions: true, showStack: true })); 
 });
 
 app.configure('production', function(){
+  app.use(errors.errorHandler);
   app.use(express.errorHandler()); 
 });
 

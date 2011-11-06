@@ -5,6 +5,7 @@ var express = require('express');
 var querystring = require('querystring');
 
 var config = require('./config');
+var error = require('./error');
 
 var app = null;
 if (config.https.enabled) {
@@ -62,8 +63,8 @@ app.configure(function(){
   app.use(express.cookieParser());
   app.use(express.session({ secret: 'your secret here' }));
   app.use(express.compiler({ src: __dirname + '/public', enable: ['sass'] }));
-  app.use(app.router);
   app.use(express.static(__dirname + '/public'));
+  app.use(app.router);
 });
 
 var FolderProvider = require('./folderProvider').FolderProvider;
@@ -74,12 +75,14 @@ var LinkCodeProvider = require('./linkCodeProvider').LinkCodeProvider;
 var linkCodeProvider = new LinkCodeProvider();
 var DeviceProvider = require('./deviceProvider').DeviceProvider;
 var deviceProvider = new DeviceProvider('./device.db.json');
+var utils = require('./utils');
 
 var middleware = require('./middleware');
 middleware.setup(userProvider, deviceProvider, folderProvider, linkCodeProvider);
 
 require('./api')(app, deviceProvider, folderProvider, middleware);
 
+app.use(error.errorHandler);
 app.configure('development', function(){
   app.use(express.errorHandler({ dumpExceptions: true, showStack: true })); 
 });
@@ -87,7 +90,6 @@ app.configure('development', function(){
 app.configure('production', function(){
   app.use(express.errorHandler()); 
 });
-
 
 function auth(login, pass, next) {
   userProvider.findByLogin(login, function(error, user) {
@@ -358,13 +360,7 @@ app.get('/folder/:folderId?', middleware.isLogged, middleware.checkFolderAcl, fu
     folderProvider.findAll(function(error, folders){
       if (error) { return next(error); }
 
-      if (!req.session.user.admin) {
-        for (var fid in folders) {
-          if (!(req.session.user.acl.indexOf(fid) >= 0)) {
-            delete folders[fid];
-          }
-        }
-      }
+      utils.aclFilterFolderList(folders, req.session.user);
 
       res.render('folders', {
         folders: folders
@@ -372,6 +368,8 @@ app.get('/folder/:folderId?', middleware.isLogged, middleware.checkFolderAcl, fu
     });
   } else {
     folderProvider.findById(req.params.folderId, function(error, folder) {
+      if (error) { return next(error); }
+
       if (req.param('type') == 'file') {
         var filename = req.param('name');
         if (!filename) {
@@ -417,8 +415,8 @@ app.get('/folder/:folderId?', middleware.isLogged, middleware.checkFolderAcl, fu
   }
 });
 
-app.get('/linkedDevices', [middleware.isLogged, middleware.isAdmin], function(req, res, next) {
-  deviceProvider.findAll(function(error, devices) {
+app.get('/linkedDevices', middleware.isLogged, function(req, res, next) {
+  deviceProvider.findByUser(req.session.user, function(error, devices) {
     if (error) { return next(error); }
     res.render('linkedDevices', {
       devices: devices
@@ -426,7 +424,7 @@ app.get('/linkedDevices', [middleware.isLogged, middleware.isAdmin], function(re
   });
 });
 
-app.get('/linkDevice', [middleware.isLogged, middleware.isAdmin], function(req, res) {
+app.get('/linkDevice', middleware.isLogged, function(req, res) {
   res.render('linkDevice', {
     url: 'http://' + req.header('host')
   });
@@ -476,13 +474,23 @@ app.post('/modifyDevice/:ident', [middleware.isLogged, middleware.isAdmin, middl
   });
 });
 
-app.get('/getLinkCode', [middleware.isLogged, middleware.isAdmin], function(req, res) {
+app.get('/getLinkCode', middleware.isLogged, function(req, res) {
   var code = linkCodeProvider.getNewCode(req.session.user.login);
   code.url = 'http://' + req.header('host');
 
   res.contentType('application/json');
   res.send(code);
 });
+
+// always keep this as last route
+app.get('/stylesheets', function(req, res, next) {
+  next();
+});
+
+app.get('*', function(req, res, next){
+  next(new error.NotFound());
+});
+
 
 app.listen(config.listen.port, config.listen.host);
 console.log("SparkleShare Dashboard listening on port %d in %s mode", app.address().port, app.settings.env);

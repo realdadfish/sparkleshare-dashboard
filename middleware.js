@@ -3,6 +3,8 @@ var deviceProvider = null;
 var folderProvider = null;
 var linkCodeProvider = null;
 
+var error = require('./error');
+
 module.exports = {
   setup: function(up, dp, fp, lcp) {
     userProvider = up;
@@ -15,16 +17,14 @@ module.exports = {
     if (req.session.user) {
       userProvider.findByLogin(req.session.user.login, function(error, user) {
         if (error || !user) {
-          req.flash('error', 'Access denied!');
-          res.redirect('/login');
+          next(new error.Permission('You must be logged in!'));
         } else {
           req.session.user = user;
           next();
         }
       });
     } else {
-      req.flash('error', 'Access denied!');
-      res.redirect('/login');
+      next(new error.Permission('You must be logged in!'));
     }
   },
 
@@ -32,8 +32,7 @@ module.exports = {
     if (req.session.user.admin) {
       next();
     } else {
-      req.flash('error', 'Only admin can do this');
-      res.redirect('home');
+      next(new error.Permission('Onlu admin can do this!'));
     }
   },
 
@@ -44,8 +43,7 @@ module.exports = {
       if (req.session.user.acl.indexOf(req.params.folderId) >= 0) {
         next();
       } else {
-        req.flash('error', 'You do not have a permission to access this folder');
-        res.redirect('home');
+        next(new error.Permission('You do not have a permission to access this folder'));
       }
     }
   },
@@ -55,7 +53,7 @@ module.exports = {
       throw new Error('No login specified');
     } else {
       userProvider.findByLogin(req.params.login, function(error, user) {
-        if (error || !user) { throw new Error('User not found'); }
+        if (error || !user) { next(new error.ISE('User not found!')); }
         req.loadedUser = user;
         next();
       });
@@ -76,10 +74,10 @@ module.exports = {
 
   loadFolder: function(req, res, next) {
     if (!req.params.folderId) {
-      throw new Error('No folder specified');
+      next(new error.NotFound('No folder specified'));
     } else {
       folderProvider.findById(req.params.folderId, function(error, folder) {
-        if (error || !folder) { throw new Error('Folder not found'); }
+        if (error || !folder) { next(new error.NotFound('Folder not found')); }
         req.loadedFolder = folder;
         next();
       });
@@ -128,7 +126,7 @@ module.exports = {
             if (error || !user) {
               res.send('Invalid owner', 403);
             } else {
-              req.deviceAcl = user.acl;
+              req.session.user = user;
               next();
             }
           });

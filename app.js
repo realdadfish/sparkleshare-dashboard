@@ -5,7 +5,7 @@ var express = require('express');
 var querystring = require('querystring');
 
 var config = require('./config');
-var error = require('./error');
+var errors = require('./error');
 
 var app = null;
 if (config.https.enabled) {
@@ -82,7 +82,7 @@ middleware.setup(userProvider, deviceProvider, folderProvider, linkCodeProvider)
 
 require('./api')(app, deviceProvider, folderProvider, middleware);
 
-app.use(error.errorHandler);
+app.use(errors.errorHandler);
 app.configure('development', function(){
   app.use(express.errorHandler({ dumpExceptions: true, showStack: true })); 
 });
@@ -330,10 +330,7 @@ app.post('/createUser', [middleware.isLogged, middleware.isAdmin], function(req,
 app.get('/publicFolder/:folderId', function(req, res, next) {
   folderProvider.findById(req.params.folderId, function(error, folder) {
     if (!folder.pub) {
-      res.render('error', {
-        status: 403,
-        message: 'Bad public link'
-      });
+      next(new errors.Permission('This is not a public folder'));
     } else {
       var filename = req.param('name');
       if (!filename) {
@@ -489,7 +486,7 @@ app.get('/stylesheets', function(req, res, next) {
 });
 
 app.get('*', function(req, res, next){
-  next(new error.NotFound());
+  next(new errors.NotFound());
 });
 
 

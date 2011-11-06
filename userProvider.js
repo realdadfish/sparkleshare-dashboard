@@ -49,13 +49,7 @@ UserProvider.prototype = {
     });
   },
 
-  createNew: function(login, name, password, admin, next) {
-    if (typeof(admin) == "function") {
-      // admin is optional
-      next = admin;
-      admin = false;
-    }
-
+  createNew: function(login, name, password, admin, acl, next) {
     var provider = this;
     this.findByLogin(login, function(error, user) {
       if (!user) {
@@ -64,6 +58,7 @@ UserProvider.prototype = {
         newUser.name = name;
         newUser.setPassword(password);
         newUser.admin = admin;
+        newUser.acl = acl;
         provider.users.push(newUser);
         provider.saveToFile(function(error) {
           if (error) { return next(error); }
@@ -135,6 +130,7 @@ User = function(data) {
   this.salt = "";
   this.pass = "";
   this.admin = false;
+  this.acl = [];
 
   if (data) {
     this.login = data.login;
@@ -142,6 +138,7 @@ User = function(data) {
     this.salt = data.salt;
     this.pass = data.pass;
     this.admin = data.admin ? true : false;
+    this.acl = data.acl ? data.acl : [];
   }
 };
 

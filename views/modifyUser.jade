@@ -8,5 +8,20 @@ form(method="post", action=basepath + "/modifyUser/" + encodeURIComponent(u.logi
     label Admin:
     input(type="checkbox", name="admin", value="t", checked=u.admin)
   p
+    h2 Folder ACL
+    - if (folders)
+      table
+        tr
+          th Folder
+          th Access
+        - each folder in folders
+          tr
+            td= folder.name
+            td
+              - var hasAccess = false;
+              - if (u.acl.indexOf(folder.id) >= 0)
+                - hasAccess = true;
+              input(type="checkbox", name="acl[]", value=folder.id, checked=hasAccess)
+  p
     input(type="submit", value="Modify")
     input(type="hidden", name="login", value=u.login)

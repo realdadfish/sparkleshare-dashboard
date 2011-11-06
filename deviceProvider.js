@@ -44,11 +44,13 @@ DeviceProvider.prototype = {
     });
   },
 
-  createNew: function(name, next) {
+  createNew: function(name, login, next) {
     var provider = this;
 
     var newDevice = new Device();
     newDevice.name = name;
+    newDevice.owner = login;
+
     provider.devices.push(newDevice);
     provider.saveToFile(function(error) {
       if (error) { return next(error); }
@@ -57,7 +59,23 @@ DeviceProvider.prototype = {
   },
 
   findAll: function(next) {
-    next(null, this.devices);
+    next(null, this.devices.slice());
+  },
+
+  findByUser: function(user, next) {
+    var result = [];
+
+    if (user.admin) {
+      result = this.devices;
+    } else {
+      for (var i = 0; i < this.devices.length; i++) {
+        if (this.devices[i].owner == user.login) {
+          result.push(this.devices[i]);
+        }
+      }
+    }
+
+    next(null, result);
   },
 
   findByDeviceIdent: function(ident, next) {
@@ -111,10 +129,12 @@ Device = function(data) {
     this.ident = data.ident;
     this.authCode = data.authCode;
     this.name = data.name;
+    this.owner = data.owner;
   } else {
     this.ident = this.genIdent();
     this.authCode = this.genAuthCode();
     this.name = "";
+    this.owner = null;
   }
 };
 

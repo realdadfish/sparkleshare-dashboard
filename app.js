@@ -422,7 +422,6 @@ app.get('/linkedDevices', middleware.isLogged, function(req, res, next) {
 });
 
 app.get('/linkDevice', middleware.isLogged, function(req, res) {
-  var code = linkCodeProvider.getNewCode();
   var schema = config.https.enabled ? 'https' : 'http';
   var url = schema + '://' + req.header('host');
 
@@ -473,7 +472,7 @@ app.get('/getLinkCode', middleware.isLogged, function(req, res) {
   code.url = schema + '://' + req.header('host');
 
   if (config.externalUrl) {
-    url = config.externalUrl;
+    code.url = config.externalUrl;
   }
 
   res.contentType('application/json');

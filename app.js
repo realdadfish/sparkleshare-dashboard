@@ -7,6 +7,8 @@ var querystring = require('querystring');
 var config = require('./config');
 var errors = require('./error');
 
+var RedisStore = require('connect-redis')(express);
+
 var app = null;
 if (config.https.enabled) {
   var fs = require("fs");
@@ -61,7 +63,7 @@ app.configure(function(){
   app.use(express.bodyParser());
   app.use(express.methodOverride());
   app.use(express.cookieParser());
-  app.use(express.session({ secret: 'your secret here' }));
+  app.use(express.session({ secret: config.sessionSecret, store: new RedisStore() }));
   app.use(express.compiler({ src: __dirname + '/public', enable: ['sass'] }));
   app.use(express.static(__dirname + '/public'));
   app.use(app.router);

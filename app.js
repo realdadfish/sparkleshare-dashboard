@@ -6,6 +6,7 @@ var querystring = require('querystring');
 
 var config = require('./config');
 var errors = require('./error');
+var utils = require('./utils');
 
 var RedisStore = require('connect-redis')(express);
 
@@ -19,41 +20,9 @@ if (config.https.enabled) {
   app = module.exports = express.createServer();
 }
 
-
-function getLoggingFormat() {
-  if (config.logging == 'min') {
-    return 'short';
-  } else if (config.logging == 'info') {
-    return 'default';
-  } else if (config.logging == 'debug') {
-    return function (tokens, req, res) {
-      var status = res.statusCode;
-      var color = 32;
-
-      if (status >= 500) {
-        color = 31;
-      } else if (status >= 400) {
-        color = 33;
-      } else if (status >= 300) {
-        color = 36;
-      }
-
-      return "\033[90m" + req.method +
-        " " + req.originalUrl + " " +
-        "\033[" + color + "m" + res.statusCode +
-        " \033[90m" +
-        (new Date() - req._startTime) +
-        "ms\033[0m" +
-        " C: " + JSON.stringify(req.headers);
-    };
-  }
-
-  return null;
-}
-
 // Configuration
 app.configure(function(){
-  var lf = getLoggingFormat();
+  var lf = utils.getLoggingFormat();
   if (lf) {
     app.use(express.logger(lf));
   }
@@ -77,7 +46,6 @@ var LinkCodeProvider = require('./linkCodeProvider').LinkCodeProvider;
 var linkCodeProvider = new LinkCodeProvider();
 var DeviceProvider = require('./deviceProvider').DeviceProvider;
 var deviceProvider = new DeviceProvider('./device.db.json');
-var utils = require('./utils');
 
 var middleware = require('./middleware');
 middleware.setup(userProvider, deviceProvider, folderProvider, linkCodeProvider);

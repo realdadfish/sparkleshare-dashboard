@@ -86,6 +86,17 @@ Api = function(app, dp, fp, mw) {
       res.json(count);
     });
   });
+
+  app.get('/api/whoami', middleware.validateAuthCode, function(req, res, next) {
+    res.json({
+      login: req.session.user.login,
+      name: req.session.user.name
+    });
+  });
+
+  app.get('/api/ping', middleware.validateAuthCode, function(req, res, next) {
+    res.json("pong");
+  });
 };
 
 module.exports = Api;

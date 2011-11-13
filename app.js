@@ -467,7 +467,7 @@ app.post('/modifyDevice/:ident', [middleware.isLogged, middleware.loadDevice, mi
 });
 
 app.get('/getLinkCode', middleware.isLogged, function(req, res) {
-  var code = linkCodeProvider.getNewCode();
+  var code = linkCodeProvider.getNewCode(req.session.user.login);
   var schema = config.https.enabled ? 'https' : 'http';
   code.url = schema + '://' + req.header('host');
 

@@ -1,5 +1,6 @@
 var fs = require('fs');
 var crypto = require('crypto');
+var errors = require('./error');
 
 function hash(msg, key) {
   return crypto.createHmac('sha256', key).update(msg).digest('hex');
@@ -20,9 +21,14 @@ UserProvider.prototype = {
         newUser.setPassword(password);
         newUser.admin = admin;
         newUser.acl = acl;
-        provider.users.push(newUser);
-        provider.saveToFile(function(error) {
+        provider.rclient.incr('seq:nextUserId', function(error, nuid) {
           if (error) { return next(error); }
+          newUser.uid = nuid;
+
+          provider.rclient.set("uid:" + newUser.uid + ":user", JSON.stringify(newUser));
+          provider.rclient.set("login:" + newUser.login + ":uid", newUser.uid);
+          provider.rclient.sadd("uids", newUser.uid);
+
           next(null, newUser);
         });
       } else {
@@ -32,34 +38,40 @@ UserProvider.prototype = {
   },
 
   updateUser: function(user, next) {
-    var id = this.findByLogin(user.login);
-    if (id === null) {
-      return next(new Error('No such user'));
-    }
-    
-    this.users[id] = user;
-    this.saveToFile(function(error) {
+    var provider = this;
+
+    this.findByUid(user.uid, function(error, fuser) {
       if (error) { return next(error); }
+      if (!fuser) { return next(new errors.NotFound("User not found")); }
+      if (user.login != fuser.login) {
+        return next(new Error("You can not change login!"));
+      }
+
+      provider.rclient.set("uid:" + fuser.uid + ":user", JSON.stringify(user));
+
       return next(null, user);
     });
   },
 
   deleteUser: function(uid, next) {
-    this.rclient.del("uid:" + uid + ":user");
-    this.rclient.del("login:" + XXX + ":uid");
-    this.rclient.srem("uids", uid);
+    var provider = this;
 
-    var id = this.findByLogin(login);
+    this.findByUid(uid, function(error, fuser) {
+      if (error) { return next(error); }
+      if (!fuser) { return next(new errors.NotFound("User not found")); }
 
-    if (id === null) {
-      return next(new Error('No such user'));
-    }
+      provider.rclient.del("uid:" + fuser.uid + ":user");
+      provider.rclient.del("login:" + fuser.login + ":uid");
+      provider.rclient.srem("uids", fuser.uid);
+
+      next();
+    });
   },
 
   findByUid: function(uid, next) {
     this.rclient.get("uid:" + uid + ":user", function(error, data) {
       if (error) { return next(error); }
-      next(null, JSON.parse(data));
+      next(null, new User(JSON.parse(data)));
     });
   },
 
@@ -81,6 +93,7 @@ UserProvider.prototype = {
 };
 
 User = function(data) {
+  this.uid = null;
   this.login = "";
   this.name = "";
   this.salt = "";
@@ -89,6 +102,7 @@ User = function(data) {
   this.acl = [];
 
   if (data) {
+    this.uid = data.uid;
     this.login = data.login;
     this.name = data.name;
     this.salt = data.salt;
@@ -103,7 +117,7 @@ User.prototype = {
     var chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
     var salt = '';
 
-    for (var i=0; i < len; i++) {
+    for (var i = 0; i < len; i++) {
       salt += chars.charAt(Math.floor(Math.random() * chars.length));
     }
     return salt;

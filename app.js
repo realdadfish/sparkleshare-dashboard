@@ -485,7 +485,7 @@ app.get('/stylesheets', function(req, res, next) {
 });
 
 app.get('*', function(req, res, next){
-  next(new errors.NotFound());
+  next(new errors.NotFound(req.url));
 });
 
 

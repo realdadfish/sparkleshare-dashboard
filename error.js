@@ -2,7 +2,7 @@ var util = require('util');
 
 function NotFound(msg) {
   this.name = 'Not Found';
-  this.message = msg;
+  this.message = msg ? msg : '';
   Error.call(this, msg); // really do not know why this is not working! Fixed by setting message manually
   Error.captureStackTrace(this, arguments.callee);
 }
@@ -10,7 +10,7 @@ util.inherits(NotFound, Error);
 
 function Permission(msg) {
   this.name = 'Forbidden';
-  this.message = msg;
+  this.message = msg ? msg : '';
   Error.call(this, msg);
   Error.captureStackTrace(this, arguments.callee);
 }
@@ -18,7 +18,7 @@ util.inherits(Permission, Error);
 
 function ISE(msg) {
   this.name = 'Internal Server Error';
-  this.message = msg;
+  this.message = msg ? msg : '';
   Error.call(this, msg);
   Error.captureStackTrace(this, arguments.callee);
 }

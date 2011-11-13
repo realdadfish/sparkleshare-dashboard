@@ -9,6 +9,7 @@ var errors = require('./error');
 var utils = require('./utils');
 
 var RedisStore = require('connect-redis')(express);
+var redis = require('redis'), redisClient = redis.createClient();
 
 var app = null;
 if (config.https.enabled) {
@@ -41,7 +42,7 @@ app.configure(function(){
 var FolderProvider = require('./folderProvider').FolderProvider;
 var folderProvider = new FolderProvider(config.folders);
 var UserProvider = require('./userProvider').UserProvider;
-var userProvider = new UserProvider('./user.db.json');
+var userProvider = new UserProvider(redisClient);
 var LinkCodeProvider = require('./linkCodeProvider').LinkCodeProvider;
 var linkCodeProvider = new LinkCodeProvider();
 var DeviceProvider = require('./deviceProvider').DeviceProvider;

@@ -5,50 +5,11 @@ function hash(msg, key) {
   return crypto.createHmac('sha256', key).update(msg).digest('hex');
 }
 
-UserProvider = function(filename, next) {
-  if (filename) {
-    this.filename = filename;
-  } else {
-    this.filename = null;
-  }
-  this.users = [];
-  
-  this.loadFromFile(next);
+UserProvider = function(redisClient) {
+  this.rclient = redisClient;
 };
 
 UserProvider.prototype = {
-  loadFromFile: function(next) {
-    if (!this.filename) { throw new Error('No filename specified'); }
-
-    var provider = this;
-
-    fs.readFile(this.filename, 'utf8', function(error, data) {
-      provider.users = [];
-
-      if (!error) {
-        var u = JSON.parse(data);
-
-        for (var i = 0; i < u.length; i++) {
-          var myuser = new User(u[i]);
-          provider.users.push(myuser);
-        }
-      }
-
-      if (next) {
-        next();
-      }
-    });
-  },
-
-  saveToFile: function(next) {
-    if (!this.filename) { return next(new Error('No filename specified')); }
-
-    fs.writeFile(this.filename, JSON.stringify(this.users), 'utf8', function(error) {
-      if (error) { return next(error); }
-      return next(null);
-    });
-  },
-
   createNew: function(login, name, password, admin, acl, next) {
     var provider = this;
     this.findByLogin(login, function(error, user) {
@@ -83,44 +44,39 @@ UserProvider.prototype = {
     });
   },
 
-  deleteUser: function(login, next) {
+  deleteUser: function(uid, next) {
+    this.rclient.del("uid:" + uid + ":user");
+    this.rclient.del("login:" + XXX + ":uid");
+    this.rclient.srem("uids", uid);
+
     var id = this.findByLogin(login);
+
     if (id === null) {
       return next(new Error('No such user'));
     }
-    
-    this.users.splice(id, 1);
-    this.saveToFile(function(error) {
+  },
+
+  findByUid: function(uid, next) {
+    this.rclient.get("uid:" + uid + ":user", function(error, data) {
       if (error) { return next(error); }
-      return next(null);
+      next(null, JSON.parse(data));
     });
   },
 
-  findAll: function(next) {
-    next(null, this.users);
-  },
-
   findByLogin: function(login, next) {
-    var result = null;
-    var resultId = null;
-
-    for (var i = 0; i < this.users.length; i++) {
-      if (this.users[i].login == login) {
-        result = this.users[i];
-        resultId = i;
-        break;
+    var up = this;
+    up.rclient.get("login:" + login + ":uid", function(error, uid) {
+      if (error) { return next(error); }
+      if (next) {
+        up.findByUid(uid, next);
       }
-    }
 
-    if (next) {
-      next(null, result);
-    }
-
-    return resultId;
+      return uid;
+    });
   },
 
   getUserCount: function(next) {
-    next(null, this.users.length);
+    this.rclient.scard("uids", next);
   }
 };
 

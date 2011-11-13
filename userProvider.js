@@ -71,16 +71,18 @@ UserProvider.prototype = {
   findByUid: function(uid, next) {
     this.rclient.get("uid:" + uid + ":user", function(error, data) {
       if (error) { return next(error); }
+      if (!data) { return next(); }
       next(null, new User(JSON.parse(data)));
     });
   },
 
   findByLogin: function(login, next) {
-    var up = this;
-    up.rclient.get("login:" + login + ":uid", function(error, uid) {
+    var provider = this;
+    provider.rclient.get("login:" + login + ":uid", function(error, uid) {
       if (error) { return next(error); }
+      if (!uid) { next(); return null; }
       if (next) {
-        up.findByUid(uid, next);
+        provider.findByUid(uid, next);
       }
 
       return uid;
@@ -89,6 +91,24 @@ UserProvider.prototype = {
 
   getUserCount: function(next) {
     this.rclient.scard("uids", next);
+  },
+
+  findAll: function(next) {
+    var provider = this;
+    provider.rclient.smembers("uids", function(error, uids)  {
+      if (error) { return next(error); }
+      var r = [];
+      var count = uids.length;
+      uids.forEach(function(uid) {
+        provider.findByUid(uid, function(error, user) {
+          if (error) { return next(error); }
+          r.push(user);
+          if (--count === 0) {
+            next(null, r);
+          }
+        });
+      });
+    });
   }
 };
 

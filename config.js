@@ -1,8 +1,8 @@
 exports.sessionSecret = 'JustSomeRandomString';
 
 exports.folders = [
-  { type: 'git', name: 'Public GIT folder', path: '/path/to/bare/git1.git', pub: true },
-  { type: 'git', name: 'Private GIT folder', path: '/path/to/bare/git2.git', pub: false }
+  { type: 'git', name: 'Public GIT folder', path: '/home/nexus/Desktop/play/SparkleDashboard-x/repos/g1', pub: true },
+  { type: 'git', name: 'Private GIT folder', path: '/home/nexus/Desktop/play/SparkleDashboard-x/repos/g2', pub: false }
 ];
 
 exports.listen = {

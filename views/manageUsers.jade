@@ -17,8 +17,8 @@ table
         - else
           | no
       td
-        a(href=basepath + "/modifyUser/" + encodeURIComponent(user.login)) Modify
+        a(href=basepath + "/modifyUser/" + user.uid) Modify
       td
-        a(href=basepath + "/deleteUser/" + encodeURIComponent(user.login)) Delete
+        a(href=basepath + "/deleteUser/" + user.uid) Delete
 p
   a(href=basepath + "/createUser") Add new user

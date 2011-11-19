@@ -41,12 +41,12 @@ app.configure(function(){
 
 var FolderProvider = require('./folderProvider').FolderProvider;
 var folderProvider = new FolderProvider(config.folders);
-var UserProvider = require('./userProvider').UserProvider;
-var userProvider = new UserProvider(redisClient);
-var LinkCodeProvider = require('./linkCodeProvider').LinkCodeProvider;
-var linkCodeProvider = new LinkCodeProvider();
 var DeviceProvider = require('./deviceProvider').DeviceProvider;
 var deviceProvider = new DeviceProvider(redisClient);
+var UserProvider = require('./userProvider').UserProvider;
+var userProvider = new UserProvider(redisClient, deviceProvider);
+var LinkCodeProvider = require('./linkCodeProvider').LinkCodeProvider;
+var linkCodeProvider = new LinkCodeProvider();
 
 var middleware = require('./middleware');
 middleware.setup(userProvider, deviceProvider, folderProvider, linkCodeProvider);
@@ -219,7 +219,7 @@ app.get('/manageUsers', [middleware.isLogged, middleware.isAdmin], function(req,
   });
 });
 
-app.get('/modifyUser/:login', [middleware.isLogged, middleware.isAdmin, middleware.loadUser], function(req, res, next) {
+app.get('/modifyUser/:uid', [middleware.isLogged, middleware.isAdmin, middleware.loadUser], function(req, res, next) {
   folderProvider.findAll(function(error, folders) {
     if (error) { return next(error); }
     res.render('modifyUser', {
@@ -229,7 +229,7 @@ app.get('/modifyUser/:login', [middleware.isLogged, middleware.isAdmin, middlewa
   });
 });
 
-app.post('/modifyUser/:login', [middleware.isLogged, middleware.isAdmin, middleware.loadUser], function(req, res, next) {
+app.post('/modifyUser/:uid', [middleware.isLogged, middleware.isAdmin, middleware.loadUser], function(req, res, next) {
   folderProvider.findAll(function(error, folders) {
     if (error) { return next(error); }
 
@@ -245,13 +245,13 @@ app.post('/modifyUser/:login', [middleware.isLogged, middleware.isAdmin, middlew
   });
 });
 
-app.get('/deleteUser/:login', [middleware.isLogged, middleware.isAdmin, middleware.loadUser], function(req, res, next) {
+app.get('/deleteUser/:uid', [middleware.isLogged, middleware.isAdmin, middleware.loadUser], function(req, res, next) {
   res.render('deleteUser', {
     u: req.loadedUser
   });
 });
 
-app.post('/deleteUser/:login', [middleware.isLogged, middleware.isAdmin, middleware.loadUser], function(req, res, next) {
+app.post('/deleteUser/:uid', [middleware.isLogged, middleware.isAdmin, middleware.loadUser], function(req, res, next) {
   var reRenderForm = function() {
     res.render('deleteUser', {
       u: req.body
@@ -260,9 +260,14 @@ app.post('/deleteUser/:login', [middleware.isLogged, middleware.isAdmin, middlew
 
   var u = req.loadedUser;
 
-  userProvider.deleteUser(u.login, function(error) {
-    req.flash('info', 'User deleted');
-    res.redirect('/manageUsers');
+  userProvider.deleteUser(u.uid, function(error) {
+    if (error) {
+      req.flash('error', error.message);
+      reRenderForm();
+    } else {
+      req.flash('info', 'User deleted');
+      res.redirect('/manageUsers');
+    }
   });
 });
 

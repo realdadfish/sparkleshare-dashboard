@@ -1,6 +1,6 @@
 h1 Delete User "#{u.login}"
 
-form(method="post", action=basepath + "/deleteUser/" + encodeURIComponent(u.login))
+form(method="post", action=basepath + "/deleteUser/" + u.uid)
   p
     label Name:
     input(name="name", value=u.name, readonly=true)

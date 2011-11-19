@@ -46,7 +46,7 @@ var userProvider = new UserProvider(redisClient);
 var LinkCodeProvider = require('./linkCodeProvider').LinkCodeProvider;
 var linkCodeProvider = new LinkCodeProvider();
 var DeviceProvider = require('./deviceProvider').DeviceProvider;
-var deviceProvider = new DeviceProvider('./device.db.json');
+var deviceProvider = new DeviceProvider(redisClient);
 
 var middleware = require('./middleware');
 middleware.setup(userProvider, deviceProvider, folderProvider, linkCodeProvider);
@@ -384,12 +384,39 @@ app.get('/folder/:folderId?', middleware.isLogged, middleware.checkFolderAcl, fu
 });
 
 app.get('/linkedDevices', middleware.isLogged, function(req, res, next) {
-  deviceProvider.findByUser(req.session.user, function(error, devices) {
-    if (error) { return next(error); }
-    res.render('linkedDevices', {
-      devices: devices
+  if (req.session.user.admin) {
+    deviceProvider.findAll(function(error, devices) {
+      if (error) { return next(error); }
+      
+      r = function(logins) {
+        res.render('linkedDevices', {
+          devices: devices,
+          logins: logins
+        });
+      };
+
+      var logins = {};
+      userProvider.findAll(function(error, users) {
+        var count = users.length;
+        if (count === 0) {
+          r(logins);
+        }
+        users.forEach(function(user) {
+          logins[user.uid] = user.login;
+          if (--count === 0) {
+            r(logins);
+          }
+        });
+      });
     });
-  });
+  } else {
+    deviceProvider.findByUserId(req.session.user.uid, function(error, devices) {
+      if (error) { return next(error); }
+      res.render('linkedDevices', {
+        devices: devices
+      });
+    });
+  }
 });
 
 app.get('/linkDevice', middleware.isLogged, function(req, res) {
@@ -406,28 +433,35 @@ app.get('/linkDevice', middleware.isLogged, function(req, res) {
 });
 
 
-app.get('/unlinkDevice/:ident', [middleware.isLogged, middleware.loadDevice, middleware.owningDevice], function(req, res, next) {
+app.get('/unlinkDevice/:did', [middleware.isLogged, middleware.loadDevice, middleware.owningDevice], function(req, res, next) {
   res.render('unlinkDevice', {
     d: req.loadedDevice
   });
 });
 
-app.post('/unlinkDevice/:ident', [middleware.isLogged, middleware.loadDevice, middleware.owningDevice], function(req, res, next) {
+app.post('/unlinkDevice/:did', [middleware.isLogged, middleware.loadDevice, middleware.owningDevice], function(req, res, next) {
   var d = req.loadedDevice;
 
-  deviceProvider.unlinkDevice(d.ident, function(error) {
-    req.flash('info', 'Device unlinked');
-    res.redirect('/linkedDevices');
+  deviceProvider.unlinkDevice(d.id, function(error) {
+    if (error) {
+      req.flash('error', error.message);
+      res.render('unlinkDevice', {
+        d: req.loadedDevice
+      });
+    } else {
+      req.flash('info', 'Device unlinked');
+      res.redirect('/linkedDevices');
+    }
   });
 });
 
-app.get('/modifyDevice/:ident', [middleware.isLogged, middleware.loadDevice, middleware.owningDevice], function(req, res, next) {
+app.get('/modifyDevice/:did', [middleware.isLogged, middleware.loadDevice, middleware.owningDevice], function(req, res, next) {
   res.render('modifyDevice', {
     d: req.loadedDevice
   });
 });
 
-app.post('/modifyDevice/:ident', [middleware.isLogged, middleware.loadDevice, middleware.owningDevice], function(req, res, next) {
+app.post('/modifyDevice/:did', [middleware.isLogged, middleware.loadDevice, middleware.owningDevice], function(req, res, next) {
   var d = req.loadedDevice;
   d.name = req.body.name;
 
@@ -438,7 +472,7 @@ app.post('/modifyDevice/:ident', [middleware.isLogged, middleware.loadDevice, mi
 });
 
 app.get('/getLinkCode', middleware.isLogged, function(req, res) {
-  var code = linkCodeProvider.getNewCode(req.session.user.login);
+  var code = linkCodeProvider.getNewCode(req.session.user.uid);
   var schema = config.https.enabled ? 'https' : 'http';
   code.url = schema + '://' + req.header('host');
 

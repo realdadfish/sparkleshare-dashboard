@@ -14,13 +14,13 @@ h1 Linked Devices
     - each device in devices
       tr
         - if (user.admin)
-          td= device.owner
+          td= logins[device.ownerUid]
         td= device.name
         td= device.ident
         td
-          a(href=basepath + "/modifyDevice/" + encodeURIComponent(device.ident)) Modify
+          a(href=basepath + "/modifyDevice/" + device.id) Modify
         td
-          a(href=basepath + "/unlinkDevice/" + encodeURIComponent(device.ident)) Unlink
+          a(href=basepath + "/unlinkDevice/" + device.id) Unlink
 
 p
   a(href=basepath + "/linkDevice") Link new device

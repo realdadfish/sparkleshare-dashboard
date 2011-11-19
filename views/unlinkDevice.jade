@@ -4,7 +4,7 @@ h1 Unlink device
   - else
     | "#{d.ident}"
 
-form(method="post", action=basepath + "/unlinkDevice/" + encodeURIComponent(d.ident))
+form(method="post", action=basepath + "/unlinkDevice/" + d.id)
   p
     - if (d.name)
       label Name:
@@ -14,4 +14,3 @@ form(method="post", action=basepath + "/unlinkDevice/" + encodeURIComponent(d.id
       input(name="name-ident", value=d.ident, readonly=true)
   p
     input(type="submit", value="Unlink")
-    input(type="hidden", name="ident", value=d.ident)

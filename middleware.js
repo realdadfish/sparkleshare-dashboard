@@ -58,10 +58,10 @@ module.exports = {
 
   loadUser: function(req, res, next) {
     if (!req.params.uid) {
-      throw new Error('No uid specified');
+      next(new errors.NotFound('No user ID specified'));
     } else {
       userProvider.findByUid(req.params.uid, function(error, user) {
-        if (error || !user) { return next(new errors.ISE('User not found!')); }
+        if (error || !user) { return next(new errors.NotFound('User not found!')); }
         req.loadedUser = user;
         next();
       });

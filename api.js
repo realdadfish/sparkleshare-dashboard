@@ -10,7 +10,7 @@ Api = function(app, dp, fp, mw) {
   middleware = mw;
 
   app.post('/api/getAuthCode', middleware.validateLinkCode, function(req, res) {
-    deviceProvider.createNew(req.param('name'), req.linkCodeForLogin, function(error, dev) {
+    deviceProvider.createNew(req.param('name'), req.linkCodeForUid, function(error, dev) {
       res.json({
         ident: dev.ident,
         authCode: dev.authCode

@@ -1,4 +1,3 @@
-var fs = require('fs');
 var crypto = require('crypto');
 var errors = require('./error');
 
@@ -60,6 +59,8 @@ UserProvider.prototype = {
       if (error) { return next(error); }
       if (!fuser) { return next(new errors.NotFound("User not found")); }
 
+      // TODO: unlink all devices
+
       provider.rclient.del("uid:" + fuser.uid + ":user");
       provider.rclient.del("login:" + fuser.login + ":uid");
       provider.rclient.srem("uids", fuser.uid);
@@ -99,6 +100,9 @@ UserProvider.prototype = {
       if (error) { return next(error); }
       var r = [];
       var count = uids.length;
+      if (count === 0) {
+        next (null, r);
+      }
       uids.forEach(function(uid) {
         provider.findByUid(uid, function(error, user) {
           if (error) { return next(error); }

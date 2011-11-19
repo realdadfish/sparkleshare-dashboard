@@ -127,7 +127,7 @@ module.exports = {
       deviceProvider.findByIdent(ident, function(error, device) {
         if (!device) {
           res.send('Invalid ident', 403);
-        } else if (!device.owner) {
+        } else if (!device.ownerUid) {
           res.send('No device owner', 500);
         } else if (device.checkAuthCode(authCode)) {
           userProvider.findByUid(device.ownerUid, function(error, user) {

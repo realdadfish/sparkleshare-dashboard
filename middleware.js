@@ -20,6 +20,7 @@ module.exports = {
           next(new errors.Permission('You must be logged in!'));
         } else {
           req.session.user = user;
+          req.currentUser = user;
           next();
         }
       });
@@ -29,7 +30,7 @@ module.exports = {
   },
 
   isAdmin: function(req, res, next) {
-    if (req.session.user.admin) {
+    if (req.currentUser.admin) {
       next();
     } else {
       next(new errors.Permission('Only admin can do this!'));
@@ -37,7 +38,7 @@ module.exports = {
   },
 
   owningDevice: function(req, res, next) {
-    if (req.session.user.admin || req.loadedDevice.ownerUid == req.session.user.uid) {
+    if (req.currentUser.admin || req.loadedDevice.ownerUid == req.currentUser.uid) {
       next();
     } else {
       next(new errors.Permission('You are not admin nor you own this device!'));
@@ -45,10 +46,10 @@ module.exports = {
   },
 
   checkFolderAcl: function(req, res, next) {
-    if (!req.params.folderId || req.session.user.admin) {
+    if (!req.params.folderId || req.currentUser.admin) {
       next();
     } else {
-      if (req.session.user.acl.indexOf(req.params.folderId) >= 0) {
+      if (req.currentUser.acl.indexOf(req.params.folderId) >= 0) {
         next();
       } else {
         next(new errors.Permission('You do not have a permission to access this folder'));
@@ -134,7 +135,8 @@ module.exports = {
             if (error || !user) {
               res.send('Invalid owner', 403);
             } else {
-              req.session.user = user;
+              req.currentUser = user;
+              req.currentDevice = device;
               next();
             }
           });

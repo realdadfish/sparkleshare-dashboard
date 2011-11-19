@@ -21,6 +21,8 @@ if (config.https.enabled) {
   app = module.exports = express.createServer();
 }
 
+var session = express.session({ secret: config.sessionSecret, store: new RedisStore() });
+
 // Configuration
 app.configure(function(){
   var lf = utils.getLoggingFormat();
@@ -33,7 +35,6 @@ app.configure(function(){
   app.use(express.bodyParser());
   app.use(express.methodOverride());
   app.use(express.cookieParser());
-  app.use(express.session({ secret: config.sessionSecret, store: new RedisStore() }));
   app.use(express.compiler({ src: __dirname + '/public', enable: ['sass'] }));
   app.use(express.static(__dirname + '/public'));
   app.use(app.router);
@@ -50,8 +51,6 @@ var linkCodeProvider = new LinkCodeProvider();
 
 var middleware = require('./middleware');
 middleware.setup(userProvider, deviceProvider, folderProvider, linkCodeProvider);
-
-require('./api')(app, deviceProvider, folderProvider, middleware);
 
 app.configure('development', function(){
   app.use(express.errorHandler({ dumpExceptions: true, showStack: true })); 
@@ -80,7 +79,7 @@ function auth(login, pass, next) {
 app.dynamicHelpers({
   messages: require('express-messages'),
   user: function(req, res) {
-    return req.session.user;
+    return req.currentUser;
   },
   basepath: function() {
     return this.set('basepath');
@@ -100,6 +99,12 @@ app.helpers({
 });
 
 // Routes
+app.all(/^(?!\/api\/).+/, function(req, res, next) {
+  session(req, res, next);
+});
+
+require('./api')(app, deviceProvider, folderProvider, middleware);
+
 app.get('/', function(req, res){
   res.redirect('/login');
 });
@@ -176,7 +181,7 @@ app.post('/login', function(req, res){
 
 app.get('/changeProfile', middleware.isLogged, function(req, res) {
   res.render('changeProfile', {
-    formval: req.session.user
+    formval: req.currentUser
   });
 });
 
@@ -197,7 +202,7 @@ app.post('/changeProfile', middleware.isLogged, function(req, res, next) {
     updatePassword = true;
   }
 
-  var user = req.session.user;
+  var user = req.currentUser;
   if (updatePassword) {
     user.setPassword(req.body.new1);
     req.flash('info', 'Password updated');
@@ -333,7 +338,7 @@ app.get('/folder/:folderId?', middleware.isLogged, middleware.checkFolderAcl, fu
     folderProvider.findAll(function(error, folders){
       if (error) { return next(error); }
 
-      utils.aclFilterFolderList(folders, req.session.user);
+      utils.aclFilterFolderList(folders, req.currentUser);
 
       res.render('folders', {
         folders: folders
@@ -389,7 +394,7 @@ app.get('/folder/:folderId?', middleware.isLogged, middleware.checkFolderAcl, fu
 });
 
 app.get('/linkedDevices', middleware.isLogged, function(req, res, next) {
-  if (req.session.user.admin) {
+  if (req.currentUser.admin) {
     deviceProvider.findAll(function(error, devices) {
       if (error) { return next(error); }
       
@@ -415,7 +420,7 @@ app.get('/linkedDevices', middleware.isLogged, function(req, res, next) {
       });
     });
   } else {
-    deviceProvider.findByUserId(req.session.user.uid, function(error, devices) {
+    deviceProvider.findByUserId(req.currentUser.uid, function(error, devices) {
       if (error) { return next(error); }
       res.render('linkedDevices', {
         devices: devices
@@ -477,7 +482,7 @@ app.post('/modifyDevice/:did', [middleware.isLogged, middleware.loadDevice, midd
 });
 
 app.get('/getLinkCode', middleware.isLogged, function(req, res) {
-  var code = linkCodeProvider.getNewCode(req.session.user.uid);
+  var code = linkCodeProvider.getNewCode(req.currentUser.uid);
   var schema = config.https.enabled ? 'https' : 'http';
   code.url = schema + '://' + req.header('host');
 

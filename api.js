@@ -22,7 +22,7 @@ Api = function(app, dp, fp, mw) {
     folderProvider.findAll(function(error, folders) {
       if (error) { return next(error); }
 
-      utils.aclFilterFolderList(folders, req.session.user);
+      utils.aclFilterFolderList(folders, req.currentUser);
 
       var f = [];
       for (var id in folders) {

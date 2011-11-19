@@ -1,140 +1,140 @@
-var fs = require('fs');
+var errors = require('./error');
 
-DeviceProvider = function(filename, next) {
-  if (filename) {
-    this.filename = filename;
-  } else {
-    this.filename = null;
-  }
-  this.devices = [];
-  
-  this.loadFromFile(next);
+DeviceProvider = function(redisClient) {
+  this.rclient = redisClient;
 };
 
 DeviceProvider.prototype = {
-  loadFromFile: function(next) {
-    if (!this.filename) { throw new Error('No filename specified'); }
-
+  createNew: function(name, uid, next) {
     var provider = this;
-
-    fs.readFile(this.filename, 'utf8', function(error, data) {
-      provider.devices = [];
-
-      if (!error) {
-        var u = JSON.parse(data);
-
-        for (var i = 0; i < u.length; i++) {
-          var mydevice = new Device(u[i]);
-          provider.devices.push(mydevice);
-        }
-      }
-
-      if (next) {
-        next();
-      }
-    });
-  },
-
-  saveToFile: function(next) {
-    if (!this.filename) { return next(new Error('No filename specified')); }
-
-    fs.writeFile(this.filename, JSON.stringify(this.devices), 'utf8', function(error) {
-      if (error) { return next(error); }
-      return next(null);
-    });
-  },
-
-  createNew: function(name, login, next) {
-    var provider = this;
-
     var newDevice = new Device();
     newDevice.name = name;
-    newDevice.owner = login;
+    newDevice.ownerUid = uid;
 
-    provider.devices.push(newDevice);
-    provider.saveToFile(function(error) {
+    provider.rclient.incr('seq:nextDeviceId', function(error, nid) {
       if (error) { return next(error); }
+      newDevice.id = nid;
+
+      provider.rclient.set("deviceId:" + newDevice.id + ":device", JSON.stringify(newDevice));
+      provider.rclient.set("deviceIdent:" + newDevice.ident + ":deviceId", newDevice.id);
+      provider.rclient.sadd("deviceIds", newDevice.id);
+      provider.rclient.sadd("uid:" + newDevice.ownerUid + ":devices", newDevice.id);
+
       next(null, newDevice);
     });
   },
 
   findAll: function(next) {
-    next(null, this.devices.slice());
+    var provider = this;
+    provider.rclient.smembers("deviceIds", function(error, ids) {
+      if (error) { return next(error); }
+      var r = [];
+      var count = ids.length;
+      if (count === 0) {
+        next (null, r);
+      }
+      ids.forEach(function(id) {
+        provider.findById(id, function(error, device) {
+          if (error) { return next(error); }
+          r.push(device);
+          if (--count === 0) {
+            next(null, r);
+          }
+        });
+      });
+    });
   },
 
-  findByUser: function(user, next) {
-    var result = [];
+  findById: function(id, next) {
+    this.rclient.get("deviceId:" + id + ":device", function(error, data) {
+      if (error) { return next(error); }
+      if (!data) { return next(); }
 
-    if (user.admin) {
-      result = this.devices;
-    } else {
-      for (var i = 0; i < this.devices.length; i++) {
-        if (this.devices[i].owner == user.login) {
-          result.push(this.devices[i]);
-        }
-      }
-    }
-
-    next(null, result);
+      next(null, new Device(JSON.parse(data)));
+    });
   },
 
-  findByDeviceIdent: function(ident, next) {
-    var result = null;
-    var resultId = null;
+  findByIdent: function(ident, next) {
+    var provider = this;
+    this.rclient.get("deviceIdent:" + ident + ":deviceId", function(error, id) {
+      if (error) { return next(error); }
+      if (!id) { return next(); }
 
-    for (var i = 0; i < this.devices.length; i++) {
-      if (this.devices[i].ident == ident) {
-        result = this.devices[i];
-        resultId = i;
-        break;
+      provider.findById(id, next);
+    });
+  },
+
+  findByUserId: function(uid, next) {
+    var provider = this;
+
+    this.rclient.smembers("uid:" + uid + ":devices", function(error, dids) {
+      if (error) { return next(error); }
+
+      var r = [];
+      var count = dids.length;
+      if (count === 0) {
+        next (null, r);
       }
-    }
-
-    if (next) {
-      next(null, result);
-    }
-
-    return resultId;
+      dids.forEach(function(did) {
+        provider.findById(did, function(error, device) {
+          if (error) { return next(error); }
+          r.push(device);
+          if (--count === 0) {
+            next(null, r);
+          }
+        });
+      });
+    });
   },
 
   updateDevice: function(device, next) {
-    var id = this.findByDeviceIdent(device.ident);
-    if (id === null) {
-      return next(new Error('No such device'));
-    }
-    
-    this.devices[id] = device;
-    this.saveToFile(function(error) {
+    var provider = this;
+    this.findById(device.id, function(error, fdevice) {
       if (error) { return next(error); }
+      if (!fdevice) { return next(new errors.NotFound("Device not found")); }
+      if (device.ident != fdevice.ident) {
+        return next(new Error("You can not change ident!"));
+      }
+      if (device.ownerUid != fdevice.ownerUid) {
+        return next(new Error("You can not change owner!"));
+      }
+
+      provider.rclient.set("deviceId:" + fdevice.id + ":device", JSON.stringify(device));
+
       return next(null, device);
     });
   },
 
-  unlinkDevice: function(ident, next) {
-    var id = this.findByDeviceIdent(ident);
-    if (id === null) {
-      return next(new Error('No such device'));
-    }
+  unlinkDevice: function(id, next) {
+    var provider = this;
 
-    this.devices.splice(id, 1);
-    this.saveToFile(function(error) {
+    this.findById(id, function(error, fdevice) {
       if (error) { return next(error); }
-      return next(null);
+      if (!fdevice) { return next(new errors.NotFound("Device not found")); }
+
+      provider.rclient.del("deviceId:" + fdevice.id + ":device");
+      provider.rclient.del("deviceIdent:" + fdevice.ident + ":deviceId");
+      provider.rclient.srem("deviceIds", fdevice.id);
+      provider.rclient.sadd("uid:" + fdevice.ownerUid + ":devices", fdevice.id);
+
+      next();
     });
   }
 };
 
 Device = function(data) {
   if (data) {
+    this.id = data.id;
     this.ident = data.ident;
     this.authCode = data.authCode;
     this.name = data.name;
-    this.owner = data.owner;
+    this.ownerUid = data.ownerUid;
   } else {
+    this.id = null;
     this.ident = this.genIdent();
     this.authCode = this.genAuthCode();
     this.name = "";
-    this.owner = null;
+    this.ownerUid = null;
   }
 };
 

@@ -5,8 +5,9 @@ function hash(msg, key) {
   return crypto.createHmac('sha256', key).update(msg).digest('hex');
 }
 
-UserProvider = function(redisClient) {
+UserProvider = function(redisClient, deviceProvider) {
   this.rclient = redisClient;
+  this.deviceProvider = deviceProvider;
 };
 
 UserProvider.prototype = {
@@ -59,11 +60,30 @@ UserProvider.prototype = {
       if (error) { return next(error); }
       if (!fuser) { return next(new errors.NotFound("User not found")); }
 
-      // TODO: unlink all devices
+      var delUser = function() {
+        provider.rclient.del("uid:" + fuser.uid + ":user");
+        provider.rclient.del("uid:" + fuser.uid + ":devices");
+        provider.rclient.del("login:" + fuser.login + ":uid");
+        provider.rclient.srem("uids", fuser.uid);
+      };
 
-      provider.rclient.del("uid:" + fuser.uid + ":user");
-      provider.rclient.del("login:" + fuser.login + ":uid");
-      provider.rclient.srem("uids", fuser.uid);
+      // unlink all devices owned by user
+      provider.deviceProvider.findByUserId(fuser.uid, function(error, devices) {
+        if (error) { return next(error); }
+
+        var count = devices.length;
+        if (count === 0) {
+          delUser();
+        }
+        devices.forEach(function(device) {
+          provider.deviceProvider.unlinkDevice(device.id, function(error) {
+            if (error) { return next(error); }
+            if (--count === 0) {
+              delUser();
+            }
+          });
+        });
+      });
 
       next();
     });

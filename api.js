@@ -89,8 +89,9 @@ Api = function(app, dp, fp, mw) {
 
   app.get('/api/whoami', middleware.validateAuthCode, function(req, res, next) {
     res.json({
-      login: req.session.user.login,
-      name: req.session.user.name
+      login: req.currentUser.login,
+      name: req.currentUser.name,
+      deviceName: req.currentDevice.name
     });
   });
 

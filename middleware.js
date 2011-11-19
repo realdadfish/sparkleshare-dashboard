@@ -3,7 +3,7 @@ var deviceProvider = null;
 var folderProvider = null;
 var linkCodeProvider = null;
 
-var error = require('./error');
+var errors = require('./error');
 
 module.exports = {
   setup: function(up, dp, fp, lcp) {
@@ -15,16 +15,16 @@ module.exports = {
 
   isLogged: function(req, res, next) {
     if (req.session.user) {
-      userProvider.findByLogin(req.session.user.login, function(error, user) {
+      userProvider.findByUid(req.session.user.uid, function(error, user) {
         if (error || !user) {
-          next(new error.Permission('You must be logged in!'));
+          next(new errors.Permission('You must be logged in!'));
         } else {
           req.session.user = user;
           next();
         }
       });
     } else {
-      next(new error.Permission('You must be logged in!'));
+      next(new errors.Permission('You must be logged in!'));
     }
   },
 
@@ -32,15 +32,15 @@ module.exports = {
     if (req.session.user.admin) {
       next();
     } else {
-      next(new error.Permission('Only admin can do this!'));
+      next(new errors.Permission('Only admin can do this!'));
     }
   },
 
   owningDevice: function(req, res, next) {
-    if (req.session.user.admin || req.loadedDevice.owner == req.session.user.login) {
+    if (req.session.user.admin || req.loadedDevice.ownerUid == req.session.user.uid) {
       next();
     } else {
-      next(new error.Permission('You are not admin nor you own this device!'));
+      next(new errors.Permission('You are not admin nor you own this device!'));
     }
   },
 
@@ -51,17 +51,17 @@ module.exports = {
       if (req.session.user.acl.indexOf(req.params.folderId) >= 0) {
         next();
       } else {
-        next(new error.Permission('You do not have a permission to access this folder'));
+        next(new errors.Permission('You do not have a permission to access this folder'));
       }
     }
   },
 
   loadUser: function(req, res, next) {
-    if (!req.params.login) {
-      throw new Error('No login specified');
+    if (!req.params.uid) {
+      throw new Error('No uid specified');
     } else {
-      userProvider.findByLogin(req.params.login, function(error, user) {
-        if (error || !user) { next(new error.ISE('User not found!')); }
+      userProvider.findByUid(req.params.uid, function(error, user) {
+        if (error || !user) { return next(new errors.ISE('User not found!')); }
         req.loadedUser = user;
         next();
       });
@@ -69,11 +69,11 @@ module.exports = {
   },
 
   loadDevice: function(req, res, next) {
-    if (!req.params.ident) {
-      throw new Error('No device ident specified');
+    if (!req.params.did) {
+      next(new errors.NotFound('No device ID specified'));
     } else {
-      deviceProvider.findByDeviceIdent(req.params.ident, function(error, device) {
-        if (error || !device) { throw new Error('Device not found'); }
+      deviceProvider.findById(req.params.did, function(error, device) {
+        if (error || !device) { return next(new errors.NotFound('Device not found')); }
         req.loadedDevice = device;
         next();
       });
@@ -82,10 +82,10 @@ module.exports = {
 
   loadFolder: function(req, res, next) {
     if (!req.params.folderId) {
-      next(new error.NotFound('No folder specified'));
+      next(new errors.NotFound('No folder specified'));
     } else {
       folderProvider.findById(req.params.folderId, function(error, folder) {
-        if (error || !folder) { next(new error.NotFound('Folder not found')); }
+        if (error || !folder) { next(new errors.NotFound('Folder not found')); }
         req.loadedFolder = folder;
         next();
       });
@@ -108,7 +108,7 @@ module.exports = {
     if (code) {
       var valid = linkCodeProvider.isCodeValid(code);
       if (valid[0]) {
-        req.linkCodeForLogin = valid[1];
+        req.linkCodeForUid = valid[1];
         next();
       } else {
         res.send('Invalid link code', 403);
@@ -124,13 +124,13 @@ module.exports = {
     if (!ident || !authCode) {
       res.send('Missing auth code', 403);
     } else {
-      deviceProvider.findByDeviceIdent(ident, function(error, device) {
+      deviceProvider.findByIdent(ident, function(error, device) {
         if (!device) {
           res.send('Invalid ident', 403);
         } else if (!device.owner) {
           res.send('No device owner', 500);
         } else if (device.checkAuthCode(authCode)) {
-          userProvider.findByLogin(device.owner, function(error, user) {
+          userProvider.findByUid(device.ownerUid, function(error, user) {
             if (error || !user) {
               res.send('Invalid owner', 403);
             } else {

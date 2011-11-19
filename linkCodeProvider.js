@@ -8,7 +8,7 @@ LinkCodeProvider.prototype = {
   // 6 chars for linking code
   codeLen: 6,
 
-  getNewCode: function(login) {
+  getNewCode: function(uid) {
     this.gc();
 
     var code = Math.floor(Math.random() * Math.pow(10, this.codeLen)).toString();
@@ -17,7 +17,7 @@ LinkCodeProvider.prototype = {
     this.validCodes.push({
       code: code,
       validUntil: (new Date()).getTime() + config.linkCodeValidFor * 1000,
-      forLogin: login
+      ownerUid: uid
     });
 
     return {code: code, validFor: config.linkCodeValidFor};
@@ -38,20 +38,20 @@ LinkCodeProvider.prototype = {
 
   isCodeValid: function(code) {
     var valid = false;
-    var forLogin = null;
+    var ownerUid = null;
     var now = (new Date()).getTime();
 
     for (var i = 0; i < this.validCodes.length; i++) {
       if (this.validCodes[i].code == code && now < this.validCodes[i].validUntil) {
         this.validCodes[i].validUntil = 0;
         valid = true;
-        forLogin = this.validCodes[i].forLogin;
+        ownerUid = this.validCodes[i].ownerUid;
         break;
       }
     }
 
     this.gc();
-    return [valid, forLogin];
+    return [valid, ownerUid];
   }
 };
 

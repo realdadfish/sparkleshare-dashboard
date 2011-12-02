@@ -24,3 +24,9 @@ exports.linkCodeValidFor = 300;
 
 // none | min | info | debug
 exports.logging = 'none';
+
+exports.fanout = {
+  enabled: false,
+  host: null,
+  port: 1986
+};

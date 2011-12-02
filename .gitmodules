@@ -1,0 +1,3 @@
+[submodule "fanout"]
+	path = fanout
+	url = git://github.com/nextsux/fanout.node.js.git

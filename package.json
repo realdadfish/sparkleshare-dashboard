@@ -11,4 +11,7 @@
     , "connect-redis": ">= 1.1.0"
     , "redis": ">=0.6.7"
   }
+  , "scripts": {
+    "start": "node ./app.js"
+  }
 }

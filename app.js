@@ -3,6 +3,7 @@
  */
 var express = require('express');
 var querystring = require('querystring');
+var i18n = require("i18n");
 
 var config = require('./config');
 var errors = require('./error');
@@ -23,6 +24,10 @@ if (config.https.enabled) {
 
 var session = express.session({ secret: config.sessionSecret, store: new RedisStore() });
 
+i18n.configure({
+    locales: ['en', 'cs']
+});
+
 // Configuration
 app.configure(function(){
   var lf = utils.getLoggingFormat();
@@ -37,6 +42,7 @@ app.configure(function(){
   app.use(express.cookieParser());
   app.use(express.compiler({ src: __dirname + '/public', enable: ['sass'] }));
   app.use(express.static(__dirname + '/public'));
+  app.use(i18n.init);
   app.use(app.router);
 });
 
@@ -95,7 +101,9 @@ app.helpers({
     }
 
     return (Math.round(bytes * 100, 2) / 100).toString() + " " + ["", "Ki", "Mi", "Gi"][unit] + "B";
-  }
+  },
+  __i: i18n.__,
+  __n: i18n.__n
 });
 
 // Routes

@@ -10,6 +10,7 @@
     , "mime": ">= 0.0.1"
     , "connect-redis": ">= 1.1.0"
     , "redis": ">=0.6.7"
+    , "i18n": ">=0.3.0"
   }
   , "scripts": {
     "start": "node ./app.js"

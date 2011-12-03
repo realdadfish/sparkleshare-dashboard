@@ -1,15 +1,15 @@
 .loginscreen
-  h1 Login to your Dashboard
+  h1= __i('Login to your Dashboard')
 
   - if (!user)
     form(method="post", action=basepath + "/login")
       div.iwrapper
-        label(for="login", id="loginlabel") Username:
+        label(for="login", id="loginlabel")= __i('Username:')
         input(type="text", name="login", id="login")
       div.iwrapper
-        label(for="password", id="passwordlabel") Password:
+        label(for="password", id="passwordlabel")= __i('Password:')
         input(type="password", name="password", id="password")
-      input.login(type="submit", value="Login", class="submit")
+      input.login(type="submit", value=__i('Login'), class="submit")
 
   script(type="text/javascript")
     function hideLabelForAutocomplete() {

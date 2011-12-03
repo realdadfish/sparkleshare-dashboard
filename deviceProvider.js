@@ -8,19 +8,43 @@ DeviceProvider.prototype = {
   createNew: function(name, uid, next) {
     var provider = this;
     var newDevice = new Device();
-    newDevice.name = name;
-    newDevice.ownerUid = uid;
+    name = name ? name : '';
 
-    provider.rclient.incr('seq:nextDeviceId', function(error, nid) {
+    provider.findUniqueNameForUid(uid, name, 0, function(error, reqName) {
       if (error) { return next(error); }
-      newDevice.id = nid;
 
-      provider.rclient.set("deviceId:" + newDevice.id + ":device", JSON.stringify(newDevice));
-      provider.rclient.set("deviceIdent:" + newDevice.ident + ":deviceId", newDevice.id);
-      provider.rclient.sadd("deviceIds", newDevice.id);
-      provider.rclient.sadd("uid:" + newDevice.ownerUid + ":devices", newDevice.id);
+      newDevice.name = reqName;
+      newDevice.ownerUid = uid;
+      
+      provider.rclient.incr('seq:nextDeviceId', function(error, nid) {
+        if (error) { return next(error); }
+        newDevice.id = nid;
 
-      next(null, newDevice);
+        provider.rclient.set("deviceId:" + newDevice.id + ":device", JSON.stringify(newDevice));
+        provider.rclient.set("deviceIdent:" + newDevice.ident + ":deviceId", newDevice.id);
+        provider.rclient.sadd("deviceIds", newDevice.id);
+        provider.rclient.sadd("uid:" + newDevice.ownerUid + ":devices", newDevice.id);
+        provider.rclient.sadd("uid:" + newDevice.ownerUid + ":deviceNames", newDevice.name);
+
+        next(null, newDevice);
+      });
+    });
+  },
+
+  findUniqueNameForUid: function(uid, name, num, next) {
+    var provider = this;
+    var reqName = name;
+    if (num > 0) {
+      reqName += " (" + num + ")";
+    }
+
+    provider.rclient.sismember("uid:" + uid + ":deviceNames", reqName, function(error, ismember) {
+      if (error) { return next(error); }
+      if (ismember) {
+        provider.findUniqueNameForUid(uid, name, ++num, next);
+      } else {
+        next(null, reqName);
+      }
     });
   },
 
@@ -99,9 +123,27 @@ DeviceProvider.prototype = {
         return next(new Error("You can not change owner!"));
       }
 
-      provider.rclient.set("deviceId:" + fdevice.id + ":device", JSON.stringify(device));
+      function saveDevice() {
+        provider.rclient.set("deviceId:" + fdevice.id + ":device", JSON.stringify(device));
 
-      return next(null, device);
+        return next(null, device);
+      }
+
+      if (device.name != fdevice.name) {
+        if (fdevice.name && fdevice.name !== '') {
+          provider.rclient.srem("uid:" + fdevice.ownerUid + ":deviceNames", fdevice.name);
+        }
+
+        provider.findUniqueNameForUid(device.ownerUid, device.name, 0, function(error, reqName) {
+          if (error) { return next(error); }
+          device.name = reqName;
+
+          provider.rclient.sadd("uid:" + device.ownerUid + ":deviceNames", device.name);
+          saveDevice();
+        });
+      } else {
+        saveDevice();
+      }
     });
   },
 
@@ -116,6 +158,9 @@ DeviceProvider.prototype = {
       provider.rclient.del("deviceIdent:" + fdevice.ident + ":deviceId");
       provider.rclient.srem("deviceIds", fdevice.id);
       provider.rclient.sadd("uid:" + fdevice.ownerUid + ":devices", fdevice.id);
+      if (fdevice.name && fdevice.name !== '') {
+        provider.rclient.srem("uid:" + fdevice.ownerUid + ":deviceNames", fdevice.name);
+      }
 
       next();
     });

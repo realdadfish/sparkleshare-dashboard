@@ -515,3 +515,6 @@ function runApp() {
     });
   }
 }
+
+// upgrade database
+require('./upgrade').upgrade(redisClient, runApp);

@@ -26,6 +26,7 @@ UserProvider.prototype = {
           newUser.uid = nuid;
 
           provider.rclient.set("uid:" + newUser.uid + ":user", JSON.stringify(newUser));
+          provider.rclient.sadd("uid:" + newUser.uid + ":deviceNames", '');
           provider.rclient.set("login:" + newUser.login + ":uid", newUser.uid);
           provider.rclient.sadd("uids", newUser.uid);
 
@@ -63,6 +64,7 @@ UserProvider.prototype = {
       var delUser = function() {
         provider.rclient.del("uid:" + fuser.uid + ":user");
         provider.rclient.del("uid:" + fuser.uid + ":devices");
+        provider.rclient.del("uid:" + fuser.uid + ":deviceNames");
         provider.rclient.del("login:" + fuser.login + ":uid");
         provider.rclient.srem("uids", fuser.uid);
       };

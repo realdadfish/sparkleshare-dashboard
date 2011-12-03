@@ -503,11 +503,15 @@ app.get('*', function(req, res, next){
   next(new errors.NotFound(req.url));
 });
 
-app.listen(config.listen.port, config.listen.host);
-console.log("SparkleShare Dashboard listening on port %d in %s mode", app.address().port, app.settings.env);
+function runApp() {
+  app.listen(config.listen.port, config.listen.host, function() {
+    console.log("SparkleShare Dashboard listening on port %d in %s mode", app.address().port, app.settings.env);
+  });
 
-if (config.fanout.enabled) {
-  var fanout = require('./fanout/fanout');
-  fanout.listen(config.fanout.port, config.fanout.host);
-  console.log("SparkleShare Fanout listening on port %d", config.fanout.port);
+  if (config.fanout.enabled) {
+    var fanout = require('./fanout/fanout');
+    fanout.listen(config.fanout.port, config.fanout.host, function() {
+      console.log("SparkleShare Fanout listening on port %d", config.fanout.port);
+    });
+  }
 }

@@ -1,4 +1,4 @@
-h1 Modify device 
+h1 #{__i('Modify device')} 
   - if (d.name)
     | "#{d.name}" (#{d.ident})
   - else
@@ -6,7 +6,7 @@ h1 Modify device
 
 form(method="post", action=basepath + "/modifyDevice/" + d.id)
   p
-    label Name:
+    label #{__i('Device name')}:
     input(name="name", value=d.name)
   p
-    input(type="submit", value="Modify")
+    input(type="submit", value=__i('Modify'))

@@ -1,20 +1,20 @@
-h1 Add User
+h1 #{__i('Add User')}
 
 form(method="post", action=basepath + "/createUser")
   p
-    label Username:
+    label #{__i('Username:')}
     input(name="login", value=formval.login)
   p
-    label Password:
+    label #{__i('Password:')}
     input(type="password", name="passwd1")
   p
-    label Check password:
+    label #{__i('Check password:')}
     input(type="password", name="passwd2")
   p
-    label Name:
+    label #{__i('Name:')}
     input(name="realname", value=formval.name)
   p
-    label Admin:
+    label #{__i('Admin:')}
     input(type="checkbox", name="admin", value="t", checked=formval.admin)
   p
-    input(type="submit", value="Add User")
+    input(type="submit", value=__i('Add User'))

@@ -1,24 +1,24 @@
-h1 Known Users
+h1 #{__i('Known Users')}
 
 table
   tr
-    th Username
-    th Name
-    th Admin
-    th Modify
-    th Delete
+    th #{__i('Username')}
+    th #{__i('Name')}
+    th #{__i('Admin')}
+    th #{__i('Modify')}
+    th #{__i('Delete')}
   - each user in users
     tr
       td= user.login
       td= user.name
       td
         - if (user.admin)
-          | YES
+          | #{__i('YES')}
         - else
-          | no
+          | #{__i('no')}
       td
-        a(href=basepath + "/modifyUser/" + user.uid) Modify
+        a(href=basepath + "/modifyUser/" + user.uid) #{__i('Modify')}
       td
-        a(href=basepath + "/deleteUser/" + user.uid) Delete
+        a(href=basepath + "/deleteUser/" + user.uid) #{__i('Delete')}
 p
-  a(href=basepath + "/createUser") Add new user
+  a(href=basepath + "/createUser") #{__i('Add new user')}

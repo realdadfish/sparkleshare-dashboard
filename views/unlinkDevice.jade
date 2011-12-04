@@ -1,4 +1,4 @@
-h1 Unlink device 
+h1 #{__i('Unlink device')} 
   - if (d.name)
     | "#{d.name}" (#{d.ident})
   - else
@@ -7,10 +7,10 @@ h1 Unlink device
 form(method="post", action=basepath + "/unlinkDevice/" + d.id)
   p
     - if (d.name)
-      label Name:
+      label #{__i('Name')}:
       input(name="name", value=d.name, readonly=true)
     - else
-      label Ident:
+      label #{__i('Ident')}:
       input(name="name-ident", value=d.ident, readonly=true)
   p
-    input(type="submit", value="Unlink")
+    input(type="submit", value=__i('Unlink'))

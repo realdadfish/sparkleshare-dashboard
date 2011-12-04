@@ -1,9 +1,9 @@
-h1 Folder #{folder.name}
+h1 #{__i('Folder %s', folder.name)}
 
 include includes/toolbox
 
 p.tofolders
-  a(href=basepath + "/folder") Back to folder list
+  a(href=basepath + "/folder") #{__i('Back to folder list')}
 p.path
   strong [#{folder.name}]/#{path}
 
@@ -18,6 +18,6 @@ ul.folders
         a(href=basepath + "/folder/" + folder.id + '?type=file&' + entry.url)= entry.name
         = " (" + convertSize(entry.fileSize) + ")"
         - if (folder.pub)
-          a(href=basepath + "/publicFolder/" + folder.id + '?' + entry.directUrl) (Public Link)
+          a(href=basepath + "/publicFolder/" + folder.id + '?' + entry.directUrl) (#{__i('Public Link')})
       - else
         a(href=basepath + "/folder/" + folder.id + '?type=dir&' + entry.url)= entry.name + '/'

@@ -1,14 +1,14 @@
-h1 Link with your mobile SparkleShare device
+h1 #{__i('Link with your mobile SparkleShare device')}
 
 script(type="text/javascript", src=basepath + "/javascripts/qrcode.js")
 script(type="text/javascript", src=basepath + "/javascripts/qrcanvas.js")
 
 p
-  strong URL: 
+  strong #{__i('URL:')} 
   #{url}
 
 p
-  strong Link code: 
+  strong #{__i('Link code:')} 
   span#linkcode
 
 #qrpart
@@ -16,9 +16,9 @@ p
     #linkqr
 
   p
-    | New code will be generated in
+    | #{__i('New code will be generated in')}
     span#timeleft 0
-    | \ seconds.
+    | \ #{__i('seconds')}.
 
 script(type="text/javascript")
   $(function() {

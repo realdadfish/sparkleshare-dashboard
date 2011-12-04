@@ -1,19 +1,19 @@
-h1 Modify User "#{u.login}"
+h1 #{__i('Modify User "%s"', u.login)}
 
 form(method="post", action=basepath + "/modifyUser/" + u.uid)
   p
-    label Name:
+    label #{__i('Name')}:
     input(name="name", value=u.name)
   p
-    label Admin:
+    label #{__i('Admin')}:
     input(type="checkbox", name="admin", value="t", checked=u.admin)
   p
-    h2 Folder ACL
+    h2 #{__i('Folder ACL')}
     - if (folders)
       table
         tr
-          th Folder
-          th Access
+          th #{__i('Folder')}
+          th #{__i('Access')}
         - each folder in folders
           tr
             td= folder.name
@@ -23,5 +23,5 @@ form(method="post", action=basepath + "/modifyUser/" + u.uid)
                 - hasAccess = true;
               input(type="checkbox", name="acl[]", value=folder.id, checked=hasAccess)
   p
-    input(type="submit", value="Modify")
+    input(type="submit", value=__i('Modify'))
     input(type="hidden", name="login", value=u.login)

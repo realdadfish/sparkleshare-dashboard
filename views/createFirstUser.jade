@@ -1,20 +1,20 @@
 .loginscreen.regscreen
-  h1 Create first user
+  h1 #{__i('Create first user')}
 
   form(method="post", action=basepath + "/createFirstUser")
     div.iwrapper.r
-      label(id="loginlabel") Username:
+      label(id="loginlabel") #{__i('Username:')}
       input(name="login", value=formval.login, id="login")
     div.iwrapper.r
-      label(id="passwd1label") Password:
+      label(id="passwd1label") #{__i('Password:')}
       input(type="password", name="passwd1", id="passwd1")
     div.iwrapper.r
-      label(id="passwd2label") Check password:
+      label(id="passwd2label") #{__i('Check password:')}
       input(type="password", name="passwd2", id="passwd2")
     div.iwrapper.r
-      label(id="realnamelabel") Name:
+      label(id="realnamelabel") #{__i('Name:')}
       input(name="realname", value=formval.name, id="realname")
-    input.register(type="submit", value="Create user")
+    input.register(type="submit", value=__i('Create user'))
 
   script(type="text/javascript")
     $("#login").focus(function() {

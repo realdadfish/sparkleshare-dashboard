@@ -1,14 +1,14 @@
-h1 Linked Devices
+h1 #{__i('Linked Devices')}
 
 - if (devices.length < 1)
-  strong You have no linked devices
+  strong #{__i('You have no linked devices')}
 - else
   table
     tr
       - if (user.admin)
-        th Owner
-      th Device name
-      th Ident
+        th #{__i('Owner')}
+      th #{__i('Device name')}
+      th #{__i('Ident')}
       th
       th
     - each device in devices
@@ -18,9 +18,9 @@ h1 Linked Devices
         td= device.name
         td= device.ident
         td
-          a(href=basepath + "/modifyDevice/" + device.id) Modify
+          a(href=basepath + "/modifyDevice/" + device.id) #{__i('Modify')}
         td
-          a(href=basepath + "/unlinkDevice/" + device.id) Unlink
+          a(href=basepath + "/unlinkDevice/" + device.id) #{__i('Unlink')}
 
 p
-  a(href=basepath + "/linkDevice") Link new device
+  a(href=basepath + "/linkDevice") #{__i('Link new device')}

@@ -149,12 +149,12 @@ app.post('/createFirstUser', middleware.userDbEmpty, function(req, res) {
   };
 
   if (!req.body.passwd1) {
-    req.flash('error', 'Password could not be empty');
+    req.flash('error', i18n.__('Password could not be empty'));
     return reRenderForm();
   }
 
   if (req.body.passwd1 != req.body.passwd2) {
-    req.flash('error', 'Passwords must match');
+    req.flash('error', i18n.__('Passwords must match'));
     return reRenderForm();
   }
 
@@ -203,7 +203,7 @@ app.post('/changeProfile', middleware.isLogged, function(req, res, next) {
   var updatePassword = false;
   if (req.body.new1) {
     if (req.body.new1 != req.body.new2) {
-      req.flash('error', 'Passwords must match');
+      req.flash('error', i18n.__('Passwords must match'));
       return reRenderForm();
     }
 
@@ -213,12 +213,12 @@ app.post('/changeProfile', middleware.isLogged, function(req, res, next) {
   var user = req.currentUser;
   if (updatePassword) {
     user.setPassword(req.body.new1);
-    req.flash('info', 'Password updated');
+    req.flash('info', i18n.__('Password updated'));
   }
   user.name = req.body.name;
 
   userProvider.updateUser(user, function(error) {
-    req.flash('info', 'Profile updated');
+    req.flash('info', i18n.__('Profile updated'));
     res.redirect('back');
   });
 });
@@ -252,7 +252,7 @@ app.post('/modifyUser/:uid', [middleware.isLogged, middleware.isAdmin, middlewar
     u.acl = req.body.acl ? req.body.acl : [];
 
     userProvider.updateUser(u, function(error) {
-      req.flash('info', 'User updated');
+      req.flash('info', i18n.__('User updated'));
       res.redirect('back');
     });
   });
@@ -278,7 +278,7 @@ app.post('/deleteUser/:uid', [middleware.isLogged, middleware.isAdmin, middlewar
       req.flash('error', error.message);
       reRenderForm();
     } else {
-      req.flash('info', 'User deleted');
+      req.flash('info', i18n.__('User deleted'));
       res.redirect('/manageUsers');
     }
   });
@@ -296,12 +296,12 @@ app.post('/createUser', [middleware.isLogged, middleware.isAdmin], function(req,
   };
 
   if (!req.body.passwd1) {
-    req.flash('error', 'Password could not be empty');
+    req.flash('error', i18n.__('Password could not be empty'));
     return reRenderForm();
   }
 
   if (req.body.passwd1 != req.body.passwd2) {
-    req.flash('error', 'Passwords must match');
+    req.flash('error', i18n.__('Passwords must match'));
     return reRenderForm();
   }
 
@@ -310,7 +310,7 @@ app.post('/createUser', [middleware.isLogged, middleware.isAdmin], function(req,
       req.flash('error', error);
       reRenderForm();
     } else {
-      req.flash('info', 'User created');
+      req.flash('info', i18n.__('User created'));
       res.redirect('/manageUsers');
     }
   });
@@ -467,7 +467,7 @@ app.post('/unlinkDevice/:did', [middleware.isLogged, middleware.loadDevice, midd
         d: req.loadedDevice
       });
     } else {
-      req.flash('info', 'Device unlinked');
+      req.flash('info', i18n.__('Device unlinked'));
       res.redirect('/linkedDevices');
     }
   });
@@ -484,7 +484,7 @@ app.post('/modifyDevice/:did', [middleware.isLogged, middleware.loadDevice, midd
   d.name = req.body.name;
 
   deviceProvider.updateDevice(d, function(error) {
-    req.flash('info', 'Device updated');
+    req.flash('info', i18n.__('Device updated'));
     res.redirect('back');
   });
 });

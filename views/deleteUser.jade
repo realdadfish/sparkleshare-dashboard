@@ -1,9 +1,9 @@
-h1 Delete User "#{u.login}"
+h1 #{__i('Delete User "%s"', u.login)}
 
 form(method="post", action=basepath + "/deleteUser/" + u.uid)
   p
-    label Name:
+    label #{__i('Name:')}
     input(name="name", value=u.name, readonly=true)
   p
-    input(type="submit", value="Delete")
+    input(type="submit", value=__i('Delete'))
     input(type="hidden", name="login", value=u.login)

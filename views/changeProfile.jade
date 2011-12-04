@@ -1,17 +1,17 @@
-h1 Change profile
+h1 #{__i('Change profile')}
 
 form(method="post", action=basepath + "/changeProfile")
   p
-    label Name:
+    label #{__i('Name:')}
     input(name="name", value=formval.name)
   p
-    label New password (leave empty for no change):
+    label #{__i('New password (leave empty for no change):')}
     input(type="password", name="new1", id="newpass1")
   p#newpass2block
-    label Check new password:
+    label #{__i('Check new password:')}
     input(type="password", name="new2", id="newpass2")
   p
-    input(type="submit", value="Change profile")
+    input(type="submit", value=__i('Change profile'))
 
 script(type="text/javascript")
   $(function() {

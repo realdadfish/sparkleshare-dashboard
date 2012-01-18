@@ -157,7 +157,7 @@ DeviceProvider.prototype = {
       provider.rclient.del("deviceId:" + fdevice.id + ":device");
       provider.rclient.del("deviceIdent:" + fdevice.ident + ":deviceId");
       provider.rclient.srem("deviceIds", fdevice.id);
-      provider.rclient.sadd("uid:" + fdevice.ownerUid + ":devices", fdevice.id);
+      provider.rclient.srem("uid:" + fdevice.ownerUid + ":devices", fdevice.id);
       if (fdevice.name && fdevice.name !== '') {
         provider.rclient.srem("uid:" + fdevice.ownerUid + ":deviceNames", fdevice.name);
       }

@@ -4,3 +4,4 @@ public/stylesheets/*.css
 user.db.json
 device.db.json
 repos
+node_modules/

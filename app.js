@@ -25,7 +25,7 @@ if (config.https.enabled) {
 var session = express.session({ secret: config.sessionSecret, store: new RedisStore() });
 
 i18n.configure({
-    locales: ['en', 'cs']
+    locales: ['en', 'cs', 'de']
 });
 
 // Configuration

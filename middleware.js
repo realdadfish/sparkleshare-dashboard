@@ -25,7 +25,7 @@ module.exports = {
         }
       });
     } else {
-      next(new errors.Permission('You must be logged in!'));
+      res.redirect('/login');
     }
   },
 

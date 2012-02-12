@@ -57,5 +57,7 @@
 	"User created": "Benutzer erstellt",
 	"User deleted": "Benutzer gelöscht",
 	"Device updated": "Gerät geändert",
-	"Device unlinked": "Gerät entfernt"
+	"Device unlinked": "Gerät entfernt",
+	"Recent changes": "Letzte Änderungen",
+	"Back to folder": "Zurück zur Ordner"
 }

@@ -57,5 +57,7 @@
 	"User created": "User created",
 	"User deleted": "User deleted",
 	"Device updated": "Device updated",
-	"Device unlinked": "Device unlinked"
+	"Device unlinked": "Device unlinked",
+	"Recent changes": "Recent changes",
+	"Back to folder": "Back to folder"
 }

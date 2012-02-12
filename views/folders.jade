@@ -6,4 +6,4 @@ ul.folders
   - each folder in folders
     li(class=folder.type)
       a(href=basepath + "/folder/" + folder.id)= folder.name
-      a(href=basepath + "/recentchanges/" + folder.id).recentchanges [Recent changes]
+      a(href=basepath + "/recentchanges/" + folder.id).recentchanges [#{__i('Recent changes')}]

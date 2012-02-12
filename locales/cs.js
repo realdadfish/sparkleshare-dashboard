@@ -57,5 +57,7 @@
 	"User created": "Uživatel vytvořen",
 	"User deleted": "Uživatel odstraněn",
 	"Device updated": "Zařízení upraveno",
-	"Device unlinked": "Párování zrušeno"
+	"Device unlinked": "Párování zrušeno",
+	"Recent changes": "Nedávné změny",
+	"Back to folder": "Zpět do složky"
 }

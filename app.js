@@ -341,6 +341,20 @@ app.get('/publicFolder/:folderId', function(req, res, next) {
   });
 });
 
+app.get('/recentchanges/:folderId?', middleware.isLogged, middleware.checkFolderAcl, function(req, res, next) {
+  folderProvider.findById(req.params.folderId, function(error, folder) {
+    if (error) { return next(error); }
+    folder.getRecentChanges(req, function(error, data) {
+      if (error) { return next(error); }
+ 
+      res.render('recentchanges', {
+        data: data,
+        folder: folder
+      });
+    });
+  });
+});
+
 app.get('/folder/:folderId?', middleware.isLogged, middleware.checkFolderAcl, function(req, res, next) {
   if (!req.params.folderId) {
     folderProvider.findAll(function(error, folders){

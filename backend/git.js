@@ -52,6 +52,122 @@ function parseList(list, curPath, next) {
   next(null, ret);
 }
 
+function parseGitLog(data) {
+  var lines =  data.split(/\r\n|\r|\n/);
+  var entries = [];
+  var entryIndex = 0;
+  var entry = "";
+  var lastEntry = "";
+  var j = 0;
+
+  for(var i=0; i<lines.length; i++) {
+    var line = lines[i];
+    if ((line.slice(0,6) == "commit") && (j > 0)) {
+      entries[entryIndex++] = entry;
+      entry = "";
+    }
+    entry = entry + line + "\n";
+    j++;
+    lastEntry = entry;
+  }
+  entries[entryIndex++] = entry;
+
+  var mergeRegex = /commit ([a-z0-9]{40})\nMerge: .+ .+\nAuthor: (.+) <(.+)>\nDate:   ([0-9]{4})-([0-9]{2})-([0-9]{2}) ([0-9]{2}):([0-9]{2}):([0-9]{2}) .([0-9]{4})\n*/;
+  var nonMergeRegex = /commit ([a-z0-9]{40})\nAuthor: (.+) <(.+)>\nDate:   ([0-9]{4})-([0-9]{2})-([0-9]{2}) ([0-9]{2}):([0-9]{2}):([0-9]{2}) (.[0-9]{4})\n*/;
+
+  var changeSet = [];
+  var changeSetIndex = 0;
+  for(var i=0; i<entries.length; i++) {
+    var logEntry = entries[i];
+    var isMergeCommit = false;
+    var regex;
+    
+    if (logEntry.indexOf("\nMerge: ") != -1) {
+      regex = mergeRegex;
+      isMergeCommit = true;
+    } 
+    else {
+      regex = nonMergeRegex;
+    }
+
+    var result = logEntry.match(regex);
+    if (result != null) {
+      var changeSetEntry = new Object();
+
+      changeSetEntry.revision = result[1];
+      changeSetEntry.username = result[2];
+      changeSetEntry.useremail = result[3];
+      changeSetEntry.isMagical = isMergeCommit;
+      var dtYear = result[4];
+      var dtMonth = result[5];
+      var dtDay = result[6];
+      var dtHour = result[7];
+      var dtMinute = result[8];
+      var dtSeconds = result[9];
+      var dtTimezone = result[10];
+      var offsetHours = dtTimezone.substring(0,3);
+      var timestamp = new Date(dtYear,
+                               dtMonth-1,
+                               dtDay,
+                               dtHour,
+                               dtMinute,
+                               dtSeconds);
+      // TODO: Figure out right way to process/save timestampe in UTC format.
+      //       Things probably won't work right if there are mismatches in
+      //       timezones between git timestamp and node.js server timezone.
+      changeSetEntry.timestamp = timestamp;
+
+      changeSetEntry.added = []; var ai = 0;
+      changeSetEntry.edited = []; var ei = 0;
+      changeSetEntry.deleted = []; var di = 0;
+      changeSetEntry.renamed = []; var ri = 0;
+
+      var entryLines = logEntry.split(/\r\n|\r|\n/);
+      for(var elIndex = 0; elIndex < entryLines.length; elIndex++) {
+        entryLine = entryLines[elIndex];
+        if (entryLine.charAt(0) == ":") {
+          var changeType = entryLine.charAt(37);
+          var filePath = entryLine.substring(39);
+          var toFilePath = "";
+
+          if (filePath.slice(-6) == ".empty") {
+            filePath = filePath.substring(0, filePath.length - ".empty".length);
+          }
+
+          if ((changeType == "A") && (filePath.indexOf(".notes") == -1)) {
+            changeSetEntry.added[ai++] = filePath;
+          }
+          else if (changeType == "M") {
+            changeSetEntry.edited[ei++] = filePath;
+          }
+          else if (changeType == "D") {
+            changeSetEntry.deleted[di++] = filePath;
+          }
+          else if (changeType == "R") {
+            var renamedObj = new Object();
+            var tabPos = entryLine.lastIndexOf("\t");
+            filePath = entryLine.substring(42, tabPos);
+            toFilePath = entryLine.substring(tabPos + 1);
+  
+            renamedObj.from = filePath;
+            renamedObj.to = toFilePath;
+
+            changeSetEntry.renamed[ri++] = renamedObj;
+          }
+        }
+      }
+      
+      if ((changeSetEntry.added.length 
+           + changeSetEntry.edited.length 
+           + changeSetEntry.deleted.length 
+           + changeSetEntry.renamed.length) > 0) {
+          changeSet[changeSetIndex++] = changeSetEntry;
+      }
+    }
+  }
+  return changeSet;
+}
+
 GitBackend.prototype = {
   execGit: function(params, ondata, next) {
     if (typeof(next) == "undefined") {
@@ -129,6 +245,15 @@ GitBackend.prototype = {
     } else {
       getItemsFromHere(baseHash, path, next);
     }
+  },
+
+  getRecentChanges: function(req, next) {
+    this.execGit(['log', '-50', '--raw', '-M', '--date=iso'], function(error, data) {
+      if (error) { return next(error); }
+
+      var changes = parseGitLog(data)
+      next(null, changes);
+    });
   },
 
   getId: function(next) {

@@ -1,0 +1,41 @@
+h1 #{folder.name} - #{__i('Recent Changes')} 
+
+include includes/toolbox
+
+p
+  a(href=basepath + "/folder") #{__i('Back to folder list')}
+
+p
+  a(href=basepath + "/folder/" + folder.id) #{__i('Back to folder')} [#{folder.name}]
+
+ul.changesets
+  - each changeset in data
+    li(class='changeset')
+      p
+        = changeset.timestamp
+      p
+        #{changeset.username} &lt;#{changeset.useremail}&gt;
+      ul.change
+        - if (changeset.edited.length)
+          - each change in changeset.edited
+            li(class='edited')
+              p
+                = change
+        - if (changeset.added.length)
+          - each change in changeset.added
+            li(class='added')
+              p
+                = change
+        - if (changeset.deleted.length)
+          - each change in changeset.deleted
+            li(class='deleted')
+              p
+                = change
+        - if (changeset.renamed.length)
+          - each change in changeset.renamed
+            li(class='renamed')
+              .from
+                #{change.from}
+              .to
+                #{change.to}
+         

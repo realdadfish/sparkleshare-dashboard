@@ -4,6 +4,10 @@ include includes/toolbox
 
 p.tofolders
   a(href=basepath + "/folder") #{__i('Back to folder list')}
+
+p.recentchanges
+  a(href=basepath + "/recentchanges/" + folder.id) #{__i('Recent changes')}
+
 p.path
   strong [#{folder.name}]/#{path}
 

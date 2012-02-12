@@ -53,7 +53,7 @@ function parseList(list, curPath, next) {
 }
 
 function parseGitLog(data) {
-  var lines =  data.split(/\r\n|\r|\n/);
+  var lines =  data.split(/\r\n|\r|\n|\0/);
   var entries = [];
   var entryIndex = 0;
   var entry = "";
@@ -111,7 +111,7 @@ function parseGitLog(data) {
         entryLine = entryLines[elIndex];
         if (entryLine.charAt(0) == ":") {
           var changeType = entryLine.charAt(37);
-          var filePath = entryLine.substring(39);
+          var filePath = entryLines[elIndex + 1];
           var toFilePath = "";
 
           if (filePath.slice(-6) == ".empty") {
@@ -130,8 +130,8 @@ function parseGitLog(data) {
           else if (changeType == "R") {
             var renamedObj = new Object();
             var tabPos = entryLine.lastIndexOf("\t");
-            filePath = entryLine.substring(42, tabPos);
-            toFilePath = entryLine.substring(tabPos + 1);
+            filePath = entryLines[elIndex + 1];
+            toFilePath = entryLines[elIndex + 2];
   
             renamedObj.from = filePath;
             renamedObj.to = toFilePath;
@@ -149,6 +149,7 @@ function parseGitLog(data) {
       }
     }
   }
+
   return changeSet;
 }
 
@@ -232,7 +233,7 @@ GitBackend.prototype = {
   },
 
   getRecentChanges: function(req, next) {
-    this.execGit(['log', '-50', '--raw', '-M', '--date=iso'], function(error, data) {
+    this.execGit(['log', '-z', '-50', '--raw', '-M', '--date=iso'], function(error, data) {
       if (error) { return next(error); }
 
       var changes = parseGitLog(data)

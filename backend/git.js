@@ -72,8 +72,8 @@ function parseGitLog(data) {
   }
   entries[entryIndex++] = entry;
 
-  var mergeRegex = /commit ([a-z0-9]{40})\nMerge: .+ .+\nAuthor: (.+) <(.+)>\nDate:   ([0-9]{4})-([0-9]{2})-([0-9]{2}) ([0-9]{2}):([0-9]{2}):([0-9]{2}) .([0-9]{4})\n*/;
-  var nonMergeRegex = /commit ([a-z0-9]{40})\nAuthor: (.+) <(.+)>\nDate:   ([0-9]{4})-([0-9]{2})-([0-9]{2}) ([0-9]{2}):([0-9]{2}):([0-9]{2}) (.[0-9]{4})\n*/;
+  var mergeRegex = /commit ([a-z0-9]{40})\nMerge: .+ .+\nAuthor: (.+) <(.+)>\nDate:   (.+)\n*/;
+  var nonMergeRegex = /commit ([a-z0-9]{40})\nAuthor: (.+) <(.+)>\nDate:   (.+)\n*/;
 
   var changeSet = [];
   var changeSetIndex = 0;
@@ -98,23 +98,7 @@ function parseGitLog(data) {
       changeSetEntry.username = result[2];
       changeSetEntry.useremail = result[3];
       changeSetEntry.isMagical = isMergeCommit;
-      var dtYear = result[4];
-      var dtMonth = result[5];
-      var dtDay = result[6];
-      var dtHour = result[7];
-      var dtMinute = result[8];
-      var dtSeconds = result[9];
-      var dtTimezone = result[10];
-      var offsetHours = dtTimezone.substring(0,3);
-      var timestamp = new Date(dtYear,
-                               dtMonth-1,
-                               dtDay,
-                               dtHour,
-                               dtMinute,
-                               dtSeconds);
-      // TODO: Figure out right way to process/save timestampe in UTC format.
-      //       Things probably won't work right if there are mismatches in
-      //       timezones between git timestamp and node.js server timezone.
+      var timestamp = new Date(result[4]);
       changeSetEntry.timestamp = timestamp;
 
       changeSetEntry.added = []; var ai = 0;

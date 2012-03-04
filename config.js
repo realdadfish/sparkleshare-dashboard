@@ -30,3 +30,9 @@ exports.fanout = {
   host: null,
   port: 1986
 };
+
+exports.backend = {
+  'git': {
+    'bin': 'git'
+  }
+};

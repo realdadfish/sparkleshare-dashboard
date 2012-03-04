@@ -1,3 +1,5 @@
+var config = require('../config');
+
 GitBackend = function (path) {
   this.path = path;
 };
@@ -160,7 +162,7 @@ GitBackend.prototype = {
       ondata = null;
     }
 
-    var g = spawn('git', params, { encoding: 'binary', env: {
+    var g = spawn(config.backend.git.bin, params, { encoding: 'binary', env: {
       GIT_DIR: this.path
     }});
 

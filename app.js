@@ -37,6 +37,12 @@ app.configure(function(){
   app.set('views', __dirname + '/views');
   app.set('view engine', 'jade');
   app.set('basepath', config.basepath);
+  app.use(function(req, res, next) {
+    if ('x-forwarded-proto' in req.headers && req.headers['x-forwarded-proto'] == 'https') {
+      req.connection.encrypted = true;
+    }
+    next();
+  });
   app.use(express.bodyParser());
   app.use(express.methodOverride());
   app.use(express.cookieParser());

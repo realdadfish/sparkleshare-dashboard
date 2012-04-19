@@ -23,7 +23,7 @@
 	"Folders": "Ordner",
 	"New password (leave empty for no change):": "Neues Passwort (leer lassen für keine Änderung):",
 	"Check new password:": "Neues Passwort prüfen:",
-	"Link with your mobile SparkleShare device": "Verbinden Sie ihre mobilen SparkleShare Geräte",
+	"Link with your mobile SparkleShare device": "Mit Ihrem mobilen SparkleShare-Gerät verbinden",
 	"URL:": "URL:",
 	"Link code:": "Linkcode:",
 	"New code will be generated in": "Neuer Code wird generiert in",
@@ -59,5 +59,5 @@
 	"Device updated": "Gerät geändert",
 	"Device unlinked": "Gerät entfernt",
 	"Recent changes": "Letzte Änderungen",
-	"Back to folder": "Zurück zur Ordner"
+	"Back to folder": "Zurück zum Ordner"
 }

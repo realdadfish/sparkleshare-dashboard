@@ -19,7 +19,7 @@
 	"Create user": "Δημιουργία χρήστη",
 	"Folder %s": "Φάκελος %s",
 	"Back to folder list": "Πίσω στην λίστα φακέλων",
-	"Public Link": "Δημόσιος σύνδεσμος",
+	"Public Link": "Δημόσιος Σύνδεσμος",
 	"Folders": "Φάκελοι",
 	"New password (leave empty for no change):": "Νέος κωδικός (αφήστε το κενό για καμία αλλαγή):",
 	"Check new password:": "Επιβεβαίωση νέου κωδικού:",

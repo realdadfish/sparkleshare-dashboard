@@ -19,6 +19,10 @@ Backend.prototype = {
     this.backend.getRawData(req, ondata, next);
   },
 
+  createArchive: function(req, ondata, next) {
+    this.backend.createArchive(req, ondata, next);
+  },
+
   getItems: function(req, next) {
     this.backend.getItems(req, next);
   },

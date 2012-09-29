@@ -5,6 +5,8 @@ FolderProvider = function(folders){
   var onGotId = function (error, id, forBackend) {
     if (!error && id) {
       f[id] = forBackend;
+    } else {
+      console.log('could not add folder; no id returned: ' + error);
     }
   };
 

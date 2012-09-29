@@ -2,11 +2,13 @@ h1 #{__i('Folder %s', folder.name)}
 
 include includes/toolbox
 
-p.tofolders
-  a(href=basepath + "/folder") #{__i('Back to folder list')}
-
-p.recentchanges
-  a(href=basepath + "/recentchanges/" + folder.id) #{__i('Recent changes')}
+ul.folder-links
+  li
+    a(href=basepath + "/folder") #{__i('Back to folder list')}
+  li
+    a(href=basepath + "/recentchanges/" + folder.id) #{__i('Recent changes')}
+  li
+    a(href=basepath + "/download/" + folder.id + '?path=' + path) #{__i('Download folder contents')}
 
 p.path
   strong [#{folder.name}]/#{path}

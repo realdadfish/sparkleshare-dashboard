@@ -421,6 +421,40 @@ app.get('/folder/:folderId?', middleware.isLogged, middleware.checkFolderAcl, fu
   }
 });
 
+app.get('/download/:folderId', middleware.isLogged, middleware.checkFolderAcl, function(req, res, next) {
+  folderProvider.findById(req.params.folderId, function(error, folder) {
+    if (error) { return next(error); }
+    var headersSent = false;
+    var maybeSentHeaders = function() {
+      if (headersSent) {
+        return;
+      }
+      headersSent = true;
+      var filename = 'archive';
+      var path = req.param('path');
+      if (path && path != '') {
+        filename += '-' + path.replace(/[^\w\d-]/, '_');
+      }
+      filename += '-' + req.params.folderId.substring(0, 8) + '.zip';
+      res.writeHead(200, {
+        'Content-Type': 'application/zip',
+        'Content-Disposition': 'attachment; filename="' + filename + '"'
+      });
+    };
+    folder.createArchive(req, function(error, data) {
+        if (error) { return next(error); }
+        maybeSentHeaders();
+        res.write(data);
+      },
+      function(error, data) {
+        if (error) { return next(error); }
+        maybeSentHeaders();
+        res.end();
+      }
+    );
+  });
+});
+
 app.get('/linkedDevices', middleware.isLogged, function(req, res, next) {
   if (req.currentUser.admin) {
     deviceProvider.findAll(function(error, devices) {

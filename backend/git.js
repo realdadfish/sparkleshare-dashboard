@@ -161,28 +161,54 @@ GitBackend.prototype = {
       next = ondata;
       ondata = null;
     }
-
+    // needed for older git versions
+    params.unshift('--git-dir='+this.path);
     var g = spawn(config.backend.git.bin, params, { encoding: 'binary', env: {
       GIT_DIR: this.path
     }});
 
-    var out = null;
+    g.stderr.on('data', function(data) {
+       console.log('stderr: ' + data);
+    });
+
+    // under some very weird circumstances the 'exit'
+    // event may arise _before_ the 'data' event is triggered
+    // and in this case the ondata callback is called with
+    // an empty output. with this little trick we're synching
+    // the results of both callbacks and only return back if
+    // both have been called. this - of course - might be go
+    // totally wrong if some exec call does not write anything
+    // to stdout and therefor never triggers the 'data' event ...
+    var finalize = function() {
+      if (exitCode) {
+        return next(new Error('GIT failed'));
+      } else {
+        return next(null, out);
+      }
+    };
+
+    var exitCode, out;
     if (ondata) {
       g.stdout.on('data', function(data) {
+        out = true;
         ondata(null, data);
       });
     } else {
-      out = "";
       g.stdout.on('data', function(data) {
-        out += data.toString('utf8');
+         if (typeof(out) == 'undefined') {
+            out = '';
+         }
+	       out += data.toString('utf8');
+         if (typeof(exitCode) != "undefined") {
+            finalize();
+	       }
       });
     }
 
     g.on('exit', function(code) {
-      if (code) {
-        return next(new Error('GIT failed'));
-      } else {
-        return next(null, out);
+      exitCode = code;
+      if (typeof(out) != "undefined") {
+         finalize();
       }
     });
   },
@@ -197,6 +223,15 @@ GitBackend.prototype = {
     }
 
     this.execGit(['cat-file', 'blob', hash], ondata, next);
+  },
+
+  createArchive: function(req, ondata, next) {
+    var arg = 'HEAD';
+    var path = req.param('path');
+    if (path) {
+      arg += ':' + path;
+    }
+    this.execGit(['archive', arg, '--prefix=archive/', '--format=zip'], ondata, next);
   },
 
   getItems: function(req, next) {

@@ -1,3 +1,25 @@
+This is a fork of the NodeJS-driven Dashboard of the free Dropbox
+alternative SparkleShare. The original repository was removed from
+github from the author because of the "lack of interest" of the
+community.
+
+This version contains only a few little patches:
+
+- better compatibility with older Git versions
+- slightly improved rendering of contextual links in the folder view
+- the ability to download (sub)folder contents as zip files
+
+The patches are - just like the original sources - released under the
+GNU Affero General Public License v3.
+
+Have fun
+- Thomas <me@thomaskeller.biz>
+
+
+What follows are the original contents of the README.md file...
+
+----
+
 SparkleShare-Dashboard - A simple web interface to your SparkleShare server.
 
 
@@ -42,3 +64,5 @@ UI design
 Mockups are going on in hbons/SparkleShare-Design-Corner.
 Feel free to fork and add your ideas.
 
+=======
+sparkleshare-dashboard

@@ -59,5 +59,6 @@
 	"Device updated": "Gerät geändert",
 	"Device unlinked": "Gerät entfernt",
 	"Recent changes": "Letzte Änderungen",
-	"Back to folder": "Zurück zum Ordner"
+	"Back to folder": "Zurück zum Ordner",
+	"Download folder contents": "Ordnerinhalt herunterladen"
 }

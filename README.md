@@ -12,6 +12,9 @@ This version contains only a few little patches:
 The patches are - just like the original sources - released under the
 GNU Affero General Public License v3.
 
+Please have a look at the `INSTALL.md` file for more detailed
+information how to get the Dashboard up and running.
+
 Have fun
 - Thomas <me@thomaskeller.biz>
 
